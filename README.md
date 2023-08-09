@@ -1,0 +1,1 @@
+# syno-videoinfo-plugin
