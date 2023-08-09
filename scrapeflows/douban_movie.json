@@ -1,0 +1,92 @@
+{
+  "type": "movie",
+  "site": "movie.douban.com",
+  "steps": [
+    {
+      "http": {
+        "url": "https://www.douban.com/search?cat=1002&q={title}",
+        "method": "GET",
+        "headers": {
+          "Referer": "https://www.douban.com/",
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "matches: nbg.*?sid:\\s*(\\d+)\\s*,"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "https://movie.douban.com/subject/{id}/",
+              "method": "GET",
+              "headers": {
+                "Host": "movie.douban.com",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "from": "xtext: .//script[@type='application/ld+json']",
+              "into": {
+                "movie": {
+                  "title": "xtext: ./name",
+                  "tagline": "",
+                  "original_available": "xtext: ./datePublished",
+                  "summary": "xtext: ./description",
+                  "certificate": "",
+                  "genre": "xtexts: ./genre/*",
+                  "actor": "xtexts: ./actor//name",
+                  "writer": "xtexts: ./author//name",
+                  "director": "xtexts: ./director//name",
+                  "extra": {
+                    "movie.douban.com": {
+                      "rating": {
+                        "movie.douban.com": "xtext: .//ratingValue"
+                      },
+                      "poster": "xtexts: ./image",
+                      "backdrop": "xtexts: ./image"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "movie": {
+                  "summary": "xtext: .//span[@property='v:summary']"
+                }
+              }
+            }
+          },
+          {
+            "replace": {
+              "source": "movie",
+              "pattern": "(.+/photo)/s_ratio_poster/(public/.+)",
+              "replacement": "\\1/m/\\2"
+            }
+          },
+          {
+            "retval": "movie"
+          }
+        ]
+      }
+    }
+  ]
+}
