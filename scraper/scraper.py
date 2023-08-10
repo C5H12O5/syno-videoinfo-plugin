@@ -22,7 +22,7 @@ _lock = threading.Lock()
 _results: List[Any] = []
 
 
-def scrape():
+def scrape(plugin_id: str) -> str:
     """Scrape video information from a given input."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
@@ -68,7 +68,7 @@ def scrape():
     _logger.info("Total execution time: %.3f seconds", end - start)
     return json.dumps(
         {"success": True, "result": _results}, ensure_ascii=False, indent=2
-    )
+    ).replace("[plugin_id]", plugin_id)
 
 
 def _start(flow: "ScrapeFlow", limit: int):

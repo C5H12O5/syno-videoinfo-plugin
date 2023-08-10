@@ -52,9 +52,9 @@
                   "writer": "xtexts: ./author//name",
                   "director": "xtexts: ./director//name",
                   "extra": {
-                    "douban.com": {
+                    "[plugin_id]": {
                       "rating": {
-                        "douban.com": "xtext: .//ratingValue"
+                        "[plugin_id]": "xtext: .//ratingValue"
                       },
                       "poster": "xtexts: ./image",
                       "backdrop": "xtexts: ./image"

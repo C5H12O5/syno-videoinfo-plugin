@@ -46,7 +46,7 @@
                   "title": "xtext: ./name",
                   "original_available": "xtext: ./datePublished",
                   "extra": {
-                    "douban.com": {
+                    "[plugin_id]": {
                       "poster": "xtexts: ./image",
                       "backdrop": "xtexts: ./image"
                     }
