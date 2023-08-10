@@ -19,5 +19,5 @@ done
 
 
 eval "/usr/bin/env python3 "\
-	"$BASEDIR/printer.py $ARGV"
+	"$BASEDIR/main.py $ARGV"
 
