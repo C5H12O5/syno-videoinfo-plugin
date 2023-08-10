@@ -17,7 +17,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "matches: nbg.*?sid:\\s*(\\d+)\\s*,"
+          "ids": "matches: 电视剧].*?sid:\\s*(\\d+)\\s*,"
         }
       }
     },
