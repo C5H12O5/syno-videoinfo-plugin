@@ -105,7 +105,8 @@ def _http_request(url, method, headers, body, timeout):
             request = urllib.request.Request(url, body, headers, method=method)
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 response_body = response.read().decode("utf-8")
-                cache[cache_key] = response_body
+                if 200 <= response.status < 300:
+                    cache[cache_key] = response_body
                 _logger.info("HTTP response: %s", response.status)
                 _logger.debug("<==  headers: %s", response.headers)
                 _logger.debug("<==  body: %s", response_body)

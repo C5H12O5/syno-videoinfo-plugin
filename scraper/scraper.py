@@ -7,6 +7,7 @@ import threading
 import time
 from typing import Any, List
 
+from scraper.exceptions import ScrapeError
 from scraper.functions import findfunc
 
 _logger = logging.getLogger(__name__)
@@ -36,11 +37,11 @@ def scrape():
 
     # set basic logging configuration
     loglevel = getattr(logging, args.loglevel.upper())
-    logging.basicConfig(
-        level=loglevel,
-        format="%(asctime)s %(threadName)s %(levelname)s "
-               "%(filename)s:%(lineno)d - %(message)s",
+    logformat = (
+        "%(asctime)s %(threadName)s %(levelname)s "
+        "%(filename)s:%(lineno)d - %(message)s"
     )
+    logging.basicConfig(level=loglevel, format=logformat)
 
     # parse --input argument as JSON
     jsoninput = json.loads(args.input)
@@ -58,7 +59,7 @@ def scrape():
     start = time.time()
     tasks = []
     for flow in ScrapeFlow.load(args.configpath, args.type, initialval):
-        task = threading.Thread(target=fill_result, args=(flow, maxlimit))
+        task = threading.Thread(target=_start, args=(flow, maxlimit))
         tasks.append(task)
         task.start()
     for task in tasks:
@@ -70,17 +71,20 @@ def scrape():
     )
 
 
-def fill_result(flow: "ScrapeFlow", limit: int):
-    """Fill the global list with the results from the flow."""
-    result_gen = flow.start()
-    while True:
-        with _lock:
-            if len(_results) >= limit:
-                break
-            try:
-                _results.append(next(result_gen))
-            except StopIteration:
-                break
+def _start(flow: "ScrapeFlow", limit: int):
+    """Start a scrape flow and store results."""
+    try:
+        result_gen = flow.start()
+        while True:
+            with _lock:
+                if len(_results) >= limit:
+                    break
+                try:
+                    _results.append(next(result_gen))
+                except StopIteration:
+                    break
+    except ScrapeError as e:
+        _logger.error("Error while scraping: %s", e)
 
 
 class ScrapeFlow:
