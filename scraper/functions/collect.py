@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Union
 from xml.etree import ElementTree
 
+from scraper.exceptions import ResultParseError
 from scraper.functions import Args, Func
 from scraper.utils import deep_update, str_to_etree, strip
 
@@ -31,7 +32,11 @@ class CollectArgs(Args):
 def collect(args: CollectArgs, context: dict) -> None:
     """Collect data from a source and put it into the context."""
     for ctxkey, tmpl in args.into.items():
-        result = _render(tmpl, args.source)
+        try:
+            result = _render(tmpl, args.source)
+        except Exception as e:
+            _logger.error('Failed to collect "%s" using "%s"', ctxkey, tmpl)
+            raise ResultParseError from e
         target = context.get(ctxkey)
         if isinstance(target, list) and isinstance(result, list):
             target.extend(result)

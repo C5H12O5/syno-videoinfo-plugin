@@ -14,16 +14,23 @@ plugin_id = os.path.basename(root_dir)
 # write the INFO file for this plugin
 info_tmpl = """
 {
-    "id": "${plugin_id}-${version}",
-    "entry_file": "run.sh",
-    "type": ["movie"],
-    "language": ["chs"],
-    "test_example": {
-        "movie": {
-            "title": "巨齿鲨2",
-            "original_available": "2023-08-04"
-        }
+  "id": "${plugin_id}-${version}",
+  "entry_file": "run.sh",
+  "type": ["movie", "tvshow"],
+  "language": ["chs"],
+  "test_example": {
+    "movie": {
+      "title": "两杆大烟枪 Lock, Stock and Two Smoking Barrels"
+    },
+    "tvshow": {
+      "title": "怪奇物语 第一季 Stranger Things Season 1"
+    },
+    "tvshow_episode": {
+      "title": "怪奇物语 第一季 Stranger Things Season 1"
+      "season": 1,
+      "episode": 1
     }
+  }
 }
 """
 with open(os.path.join(root_dir, "INFO"), "w", encoding="utf-8") as writer:
