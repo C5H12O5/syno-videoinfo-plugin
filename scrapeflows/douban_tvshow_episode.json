@@ -51,8 +51,6 @@
                   "actor": "xtexts: ./actor//name",
                   "writer": "xtexts: ./author//name",
                   "director": "xtexts: ./director//name",
-                  "season": "{$parent[season]}",
-                  "episode": "{$parent[episode]}",
                   "extra": {
                     "douban.com": {
                       "tvshow": {
@@ -88,6 +86,17 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          {
+            "collect": {
+              "source": "$parent",
+              "into": {
+                "episode": {
+                  "season": "get: season",
+                  "episode": "get: episode"
                 }
               }
             }

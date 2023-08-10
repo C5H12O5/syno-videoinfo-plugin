@@ -2,7 +2,7 @@
 import logging
 import re
 from dataclasses import dataclass
-from typing import Union
+from typing import Any, Union
 from xml.etree import ElementTree
 
 from scraper.exceptions import ResultParseError
@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 class CollectArgs(Args):
     """Arguments for the collect function."""
 
-    source: str
+    source: Any
     into: dict
 
     def parse(self, rawargs: dict, context: dict) -> "CollectArgs":
@@ -48,7 +48,7 @@ def collect(args: CollectArgs, context: dict) -> None:
         _logger.debug("<==  result: %s", context[ctxkey])
 
 
-def _render(tmpl: Union[list, dict, str], source: str, etree=None):
+def _render(tmpl: Union[list, dict, str], source, etree=None):
     """Render a template with the given source."""
     if isinstance(tmpl, list):
         return [_render(item, source, etree) for item in tmpl]
@@ -61,12 +61,18 @@ def _render(tmpl: Union[list, dict, str], source: str, etree=None):
             return tmpl
         # split template string into strategy and expression
         strategy, expr = [s.strip() for s in tmpl.split(":", 1)]
-        if strategy.startswith("x"):
-            # convert source to etree if necessary
-            etree = str_to_etree(source) if etree is None else etree
-            return strip(_xpath_find(strategy, expr, etree))
+        if isinstance(source, str):
+            if strategy.startswith("x"):
+                # convert source to etree if necessary
+                etree = str_to_etree(source) if etree is None else etree
+                return strip(_xpath_find(strategy, expr, etree))
+            else:
+                return strip(_regex_match(strategy, expr, source))
+        elif isinstance(source, dict):
+            if strategy == "get":
+                return source.get(expr)
         else:
-            return strip(_regex_match(strategy, expr, source))
+            return None
 
 
 def _xpath_find(strategy: str, expr: str, etree):
