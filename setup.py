@@ -6,10 +6,10 @@ from setuptools import setup
 
 from version import version
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.abspath(__file__))
 
 # use the name of the root directory as the plugin id
-plugin_id = os.path.basename(current_dir)
+plugin_id = os.path.basename(root_dir)
 
 # write the INFO file for this plugin
 info_tmpl = """
@@ -26,10 +26,11 @@ info_tmpl = """
     }
 }
 """
-with open(os.path.join(current_dir, "INFO"), "w", encoding="utf-8") as writer:
+with open(os.path.join(root_dir, "INFO"), "w", encoding="utf-8") as writer:
     template = string.Template(info_tmpl)
     writer.write(template.substitute(plugin_id=plugin_id, version=version()))
 
+# use 'python setup.py sdist --formats=zip' command to create the zip file
 setup(
     name=plugin_id,
     version=version(),

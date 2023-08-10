@@ -1,5 +1,5 @@
 {
-  "type": "movie",
+  "type": "tvshow",
   "site": "douban.com",
   "steps": [
     {
@@ -42,20 +42,11 @@
               "source": "subject",
               "from": "xtext: .//script[@type='application/ld+json']",
               "into": {
-                "movie": {
+                "tvshow": {
                   "title": "xtext: ./name",
-                  "tagline": "",
-                  "certificate": "",
                   "original_available": "xtext: ./datePublished",
-                  "genre": "xtexts: ./genre/*",
-                  "actor": "xtexts: ./actor//name",
-                  "writer": "xtexts: ./author//name",
-                  "director": "xtexts: ./director//name",
                   "extra": {
                     "douban.com": {
-                      "rating": {
-                        "douban.com": "xtext: .//ratingValue"
-                      },
                       "poster": "xtexts: ./image",
                       "backdrop": "xtexts: ./image"
                     }
@@ -68,7 +59,7 @@
             "collect": {
               "source": "subject",
               "into": {
-                "movie": {
+                "tvshow": {
                   "summary": "xtext: .//span[@property='v:summary']"
                 }
               }
@@ -76,13 +67,13 @@
           },
           {
             "replace": {
-              "source": "movie",
+              "source": "tvshow",
               "pattern": "(.+/photo)/s_ratio_poster/(public/.+)",
               "replacement": "\\1/m/\\2"
             }
           },
           {
-            "retval": "movie"
+            "retval": "tvshow"
           }
         ]
       }
