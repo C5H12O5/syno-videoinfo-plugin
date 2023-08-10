@@ -26,7 +26,7 @@ info_tmpl = """
       "title": "怪奇物语 第一季 Stranger Things Season 1"
     },
     "tvshow_episode": {
-      "title": "怪奇物语 第一季 Stranger Things Season 1"
+      "title": "怪奇物语 第一季 Stranger Things Season 1",
       "season": 1,
       "episode": 1
     }
