@@ -13,8 +13,8 @@ from scraper.functions import findfunc
 _logger = logging.getLogger(__name__)
 
 # define default scraping config file path
-_currentdir = os.path.dirname(os.path.realpath(__file__))
-_configpath = os.path.join(_currentdir, "../scrapeflows")
+_basedir = os.path.dirname(os.path.realpath(__file__))
+_configpath = os.path.join(_basedir, "../scrapeflows")
 
 # define maximum number of results to return
 _maxlimit = 10
@@ -46,9 +46,9 @@ def scrape():
     # parse --input argument as JSON
     jsoninput = json.loads(args.input)
     initialval = {
-        "title": jsoninput.get("title", None),
+        "title": jsoninput["title"],
         "season": jsoninput.get("season", 0),
-        "episode": jsoninput.get("episode", None),
+        "episode": jsoninput.get("episode", 1),
         "year": jsoninput.get("original_available", None),
         "lang": args.lang,
         "limit": maxlimit,

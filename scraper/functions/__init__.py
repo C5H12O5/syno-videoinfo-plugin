@@ -6,7 +6,7 @@ import logging
 import pkgutil
 from abc import ABC, abstractmethod
 from functools import wraps
-from typing import Any, Callable, Optional, Type, Union
+from typing import Any, Callable, Type
 
 _logger = logging.getLogger(__name__)
 
@@ -22,9 +22,7 @@ class Args(ABC):
         pass
 
     @staticmethod
-    def substitute(
-        obj: Optional[Union[str, list, dict]], context: dict
-    ) -> Optional[Union[str, list, dict]]:
+    def substitute(obj: Any, context: dict) -> Any:
         """Recursively substitute strings in an object with given context."""
         if isinstance(obj, str):
             return obj.format(**context)

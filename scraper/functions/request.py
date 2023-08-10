@@ -18,9 +18,9 @@ _logger = logging.getLogger(__name__)
 
 
 # define default HTTP cache configuration
-_currentdir = os.path.dirname(os.path.realpath(__file__))
+_basedir = os.path.dirname(os.path.realpath(__file__))
 _cache_name = ".httpcache"
-_cache_file = os.path.join(_currentdir, _cache_name)
+_cache_file = os.path.join(_basedir, _cache_name)
 _cache_expire = 86400
 
 # define a global opener and install it to urllib.request
@@ -41,7 +41,7 @@ class HttpArgs(Args):
     result: str
 
     def parse(self, rawargs: dict, context: dict) -> "HttpArgs":
-        self.url = self.substitute(rawargs["url"], context)  # type: ignore
+        self.url = self.substitute(rawargs["url"], context)
         self.method = rawargs["method"].upper()
         self.headers = {
             k.lower(): self.substitute(v, context)
@@ -84,9 +84,9 @@ def _http_request(url, method, headers, body, timeout):
 
     # check if the cache is expired
     shelve_flag = "c"  # creating database if not exist
-    for filename in os.listdir(_currentdir):
+    for filename in os.listdir(_basedir):
         if filename.startswith(_cache_name):
-            shelve_file = os.path.join(_currentdir, filename)
+            shelve_file = os.path.join(_basedir, filename)
             modify_time = os.path.getmtime(shelve_file)
             if (time.time() - modify_time) > _cache_expire:
                 shelve_flag = "n"  # always create a new, empty database

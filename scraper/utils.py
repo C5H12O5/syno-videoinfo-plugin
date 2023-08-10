@@ -7,6 +7,16 @@ from xml.etree import ElementTree
 from scraper.exceptions import ResultParseError
 
 
+def deep_update(d: dict, u: dict):
+    """Recursively update a dictionary."""
+    for k, v in u.items():
+        if k in d and isinstance(d[k], dict) and isinstance(v, dict):
+            d[k] = deep_update(d[k], v)
+        else:
+            d[k] = v
+    return d
+
+
 def strip(result: Any):
     """Strip leading and trailing whitespace."""
     if isinstance(result, list):

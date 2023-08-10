@@ -6,7 +6,7 @@ from typing import Union
 from xml.etree import ElementTree
 
 from scraper.functions import Args, Func
-from scraper.utils import str_to_etree, strip
+from scraper.utils import deep_update, str_to_etree, strip
 
 _logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class CollectArgs(Args):
         from_ = rawargs.get("from")
         if from_ is not None:
             self.source = _render(from_, self.source)
-        self.into = rawargs["into"]
+        self.into = self.substitute(rawargs["into"], context)
         return self
 
 
@@ -36,7 +36,7 @@ def collect(args: CollectArgs, context: dict) -> None:
         if isinstance(target, list) and isinstance(result, list):
             target.extend(result)
         elif isinstance(target, dict) and isinstance(result, dict):
-            target.update(result)
+            deep_update(target, result)
         else:
             context[ctxkey] = result
         _logger.info('Collected "%s" using "%s"', ctxkey, tmpl)
@@ -52,6 +52,8 @@ def _render(tmpl: Union[list, dict, str], source: str, etree=None):
     elif isinstance(tmpl, str):
         if len(tmpl.strip()) == 0:
             return ""
+        if ":" not in tmpl:
+            return tmpl
         # split template string into strategy and expression
         strategy, expr = [s.strip() for s in tmpl.split(":", 1)]
         if strategy.startswith("x"):

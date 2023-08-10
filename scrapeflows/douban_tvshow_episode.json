@@ -1,5 +1,5 @@
 {
-  "type": "movie",
+  "type": "tvshow_episode",
   "site": "douban.com",
   "steps": [
     {
@@ -17,7 +17,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "matches: 电影].*?sid:\\s*(\\d+)\\s*,"
+          "ids": "matches: 电视剧].*?sid:\\s*(\\d+)\\s*,"
         }
       }
     },
@@ -42,7 +42,7 @@
               "source": "subject",
               "from": "xtext: .//script[@type='application/ld+json']",
               "into": {
-                "movie": {
+                "episode": {
                   "title": "xtext: ./name",
                   "tagline": "",
                   "original_available": "xtext: ./datePublished",
@@ -51,13 +51,24 @@
                   "actor": "xtexts: ./actor//name",
                   "writer": "xtexts: ./author//name",
                   "director": "xtexts: ./director//name",
+                  "season": "{$parent[season]}",
+                  "episode": "{$parent[episode]}",
                   "extra": {
                     "douban.com": {
+                      "tvshow": {
+                        "title": "xtext: ./name",
+                        "original_available": "xtext: ./datePublished",
+                        "extra": {
+                          "douban.com": {
+                            "poster": "xtexts: ./image",
+                            "backdrop": "xtexts: ./image"
+                          }
+                        }
+                      },
                       "rating": {
                         "douban.com": "xtext: .//ratingValue"
                       },
-                      "poster": "xtexts: ./image",
-                      "backdrop": "xtexts: ./image"
+                      "poster": "xtexts: ./image"
                     }
                   }
                 }
@@ -68,21 +79,28 @@
             "collect": {
               "source": "subject",
               "into": {
-                "movie": {
-                  "summary": "xtext: .//span[@property='v:summary']"
+                "episode": {
+                  "summary": "xtext: .//span[@property='v:summary']",
+                  "extra": {
+                    "douban.com": {
+                      "tvshow": {
+                        "summary": "xtext: .//span[@property='v:summary']"
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           {
             "replace": {
-              "source": "movie",
+              "source": "episode",
               "pattern": "(.+/photo)/s_ratio_poster/(public/.+)",
               "replacement": "\\1/m/\\2"
             }
           },
           {
-            "retval": "movie"
+            "retval": "episode"
           }
         ]
       }
