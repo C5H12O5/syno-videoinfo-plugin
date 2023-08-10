@@ -6,10 +6,15 @@ from setuptools import setup
 
 from version import version
 
-_info_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "INFO")
-_info_tmpl = """
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# use the name of the root directory as the plugin id
+plugin_id = os.path.basename(current_dir)
+
+# write the INFO file for this plugin
+info_tmpl = """
 {
-    "id": "syno-videoinfo-plugin-$version",
+    "id": "${plugin_id}-${version}",
     "entry_file": "run.sh",
     "type": ["movie"],
     "language": ["chs"],
@@ -21,12 +26,12 @@ _info_tmpl = """
     }
 }
 """
-
-with open(_info_file, "w", encoding="utf-8") as f:
-    f.write(string.Template(_info_tmpl).substitute(version=version()))
+with open(os.path.join(current_dir, "INFO"), "w", encoding="utf-8") as writer:
+    template = string.Template(info_tmpl)
+    writer.write(template.substitute(plugin_id=plugin_id, version=version()))
 
 setup(
-    name="syno-videoinfo-plugin",
+    name=plugin_id,
     version=version(),
     packages=["", "scraper", "scraper.functions", "scrapeflows"],
     package_data={"": ["run.sh", "main.py", "INFO"], "scrapeflows": ["*.json"]},
