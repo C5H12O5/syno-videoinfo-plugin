@@ -84,6 +84,7 @@ def http(args: HttpArgs, context: dict) -> None:
 
 
 def _http_request(url, method, headers, body, timeout):
+    """Send an HTTP request and return the response body."""
     _logger.info("HTTP request: %s %s", method, url)
     _logger.debug("==>  headers: %s", headers)
     _logger.debug("==>  body: %s", body)

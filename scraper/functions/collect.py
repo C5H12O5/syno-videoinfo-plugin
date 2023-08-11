@@ -20,10 +20,12 @@ class CollectArgs(Args):
     into: dict
 
     def parse(self, rawargs: dict, context: dict) -> "CollectArgs":
-        self.source = context[rawargs["source"]]
+        source = context[rawargs["source"]]
         from_ = rawargs.get("from")
         if from_ is not None:
-            self.source = _render(from_, self.source)
+            source = _render(from_, source)
+
+        self.source = source
         self.into = self.substitute(rawargs["into"], context)
         return self
 
@@ -50,29 +52,46 @@ def collect(args: CollectArgs, context: dict) -> None:
 
 def _render(tmpl: Union[list, dict, str], source, etree=None):
     """Render a template with the given source."""
+    if etree is None and _need_etree(tmpl):
+        etree = str_to_etree(source)
+
     if isinstance(tmpl, list):
         return [_render(item, source, etree) for item in tmpl]
     elif isinstance(tmpl, dict):
         return {k: _render(v, source, etree) for k, v in tmpl.items()}
     elif isinstance(tmpl, str):
-        if len(tmpl.strip()) == 0:
-            return ""
-        if ":" not in tmpl:
-            return tmpl
-        # split template string into strategy and expression
-        strategy, expr = [s.strip() for s in tmpl.split(":", 1)]
-        if isinstance(source, str):
-            if strategy.startswith("x"):
-                # convert source to etree if necessary
-                etree = str_to_etree(source) if etree is None else etree
-                return strip(_xpath_find(strategy, expr, etree))
-            else:
-                return strip(_regex_match(strategy, expr, source))
-        elif isinstance(source, dict):
-            if strategy == "get":
-                return source.get(expr)
+        return _render_str(tmpl, source, etree)
+
+
+def _render_str(tmpl: str, source, etree):
+    """Render a string template with the given source."""
+    if len(tmpl.strip()) == 0:
+        return ""
+    if ":" not in tmpl:
+        return tmpl
+    # split template into strategy and expression
+    strategy, expr = [s.strip() for s in tmpl.split(":", 1)]
+    if isinstance(source, str):
+        if strategy.startswith("x"):
+            return strip(_xpath_find(strategy, expr, etree))
         else:
-            return None
+            return strip(_regex_match(strategy, expr, source))
+    elif isinstance(source, dict):
+        if strategy == "get":
+            return source.get(expr)
+    else:
+        return None
+
+
+def _need_etree(tmpl: Union[list, dict, str]):
+    """Check if the template needs an etree."""
+    if isinstance(tmpl, list):
+        return any(_need_etree(item) for item in tmpl)
+    elif isinstance(tmpl, dict):
+        return any(_need_etree(v) for v in tmpl.values())
+    elif isinstance(tmpl, str):
+        return ":" in tmpl and tmpl.split(":", 1)[0].startswith("x")
+    return False
 
 
 def _xpath_find(strategy: str, expr: str, etree):
