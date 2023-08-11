@@ -47,7 +47,7 @@ def json_to_etree(json_obj: Any, tag: str = "root"):
             element.append(json_to_etree(v, k))
     elif isinstance(json_obj, list):
         for i, item in enumerate(json_obj):
-            element.append(json_to_etree(item, f"_{str(i)}"))
+            element.append(json_to_etree(item, f"i{str(i)}"))
     elif json_obj is not None:
         element.text = str(json_obj)
     return element
