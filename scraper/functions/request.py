@@ -41,13 +41,33 @@ class HttpArgs(Args):
     result: str
 
     def parse(self, rawargs: dict, context: dict) -> "HttpArgs":
-        self.url = self.substitute(rawargs["url"], context)
-        self.method = rawargs["method"].upper()
-        self.headers = {
+        # urlencode the request query string
+        url = self.substitute(rawargs["url"], context)
+        url_split = url.split("?")
+        if len(url_split) > 1:
+            qs = urllib.parse.parse_qs(url_split[1])
+            url = url_split[0] + "?" + urllib.parse.urlencode(qs, doseq=True)
+
+        # substitute the request headers
+        headers = {
             k.lower(): self.substitute(v, context)
             for k, v in rawargs.get("headers", {}).items()
         }
-        self.body = self.substitute(rawargs.get("body"), context)
+
+        # process request body according to the content-type
+        body = self.substitute(rawargs.get("body"), context)
+        if body is not None:
+            content_type = headers.get("content-type", "").lower()
+            if content_type.startswith("application/json"):
+                body = json.dumps(body, ensure_ascii=False)
+            elif content_type.startswith("application/x-www-form-urlencoded"):
+                body = urllib.parse.urlencode(body)
+
+        # construct the arguments
+        self.url = url
+        self.method = rawargs["method"].upper()
+        self.headers = headers
+        self.body = body
         self.timeout = rawargs.get("timeout", 10)
         self.result = rawargs["result"]
         return self
@@ -67,20 +87,6 @@ def _http_request(url, method, headers, body, timeout):
     _logger.info("HTTP request: %s %s", method, url)
     _logger.debug("==>  headers: %s", headers)
     _logger.debug("==>  body: %s", body)
-
-    # urlencode the request query string
-    url_split = url.split("?")
-    if len(url_split) > 1:
-        qs = urllib.parse.parse_qs(url_split[1])
-        url = url_split[0] + "?" + urllib.parse.urlencode(qs, doseq=True)
-
-    # process request body according to content type
-    if body is not None and headers is not None:
-        content_type = headers.get("content-type", "").lower()
-        if content_type.startswith("application/json"):
-            body = json.dumps(body, ensure_ascii=False)
-        elif content_type.startswith("application/x-www-form-urlencoded"):
-            body = urllib.parse.urlencode(body)
 
     # check if the cache is expired
     shelve_flag = "c"  # creating database if not exist
