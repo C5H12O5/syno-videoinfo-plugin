@@ -23,7 +23,7 @@ _results: List[Any] = []
 
 
 def scrape(plugin_id: str) -> str:
-    """Scrape video information from a given input."""
+    """Scrape video information from given arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
     parser.add_argument("--type", type=str, required=True)
@@ -96,7 +96,7 @@ class ScrapeFlow:
         self.context = context
 
     def start(self):
-        """Execute steps until an iterable is returned."""
+        """Start the scrape flow and return a generator."""
         for funcname, rawargs in [s.popitem() for s in self.steps]:
             # execute the function with context
             iterable = findfunc(funcname)(rawargs, self.context)

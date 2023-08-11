@@ -17,16 +17,16 @@ def deep_update(d: dict, u: dict):
     return d
 
 
-def strip(result: Any):
+def strip(obj: Any):
     """Strip leading and trailing whitespace."""
-    if isinstance(result, list):
-        return list(filter(lambda x: x is not None, [strip(i) for i in result]))
-    elif isinstance(result, dict):
-        return {k: strip(v) for k, v in result.items()}
-    elif isinstance(result, str):
-        result = result.strip()
-        return result if result != "" else None
-    return result
+    if isinstance(obj, list):
+        return list(filter(lambda x: x is not None, [strip(i) for i in obj]))
+    elif isinstance(obj, dict):
+        return {k: strip(v) for k, v in obj.items()}
+    elif isinstance(obj, str):
+        obj = obj.strip()
+        return obj if obj != "" else None
+    return obj
 
 
 def str_to_etree(string: str) -> Optional[ElementTree.Element]:

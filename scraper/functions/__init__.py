@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 
 
 class Args(ABC):
-    """Abstract base class for arguments."""
+    """Abstract base class for function arguments."""
 
     def __call__(self, *args, **kwargs):
         return self.parse(*args, **kwargs)

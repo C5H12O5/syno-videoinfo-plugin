@@ -46,4 +46,5 @@ setup(
     version=version(),
     packages=["", "scraper", "scraper.functions", "scrapeflows"],
     package_data={"": ["run.sh", "main.py", "INFO"], "scrapeflows": ["*.json"]},
+    python_requires=">=3.7",
 )

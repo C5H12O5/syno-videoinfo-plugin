@@ -1,4 +1,4 @@
-"""Get the version of the project from git tags."""
+"""Version number management."""
 import subprocess
 
 __all__ = ["version"]
