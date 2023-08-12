@@ -18,7 +18,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "xp_texts: ./movies/list//id"
+          "ids": "['xp_texts', './movies/list//id']"
         }
       }
     },
@@ -42,26 +42,25 @@
           {
             "collect": {
               "source": "subject",
-              "from": "re_match: var AppData = (.*?);\\s*</script>",
+              "from": "['re_match', 'var AppData = (.*?);\\s*</script>']",
               "into": {
                 "movie": {
-                  "title": "xp_text: ./movie/nm",
-                  "tagline": "xp_text: ./movie/enm",
-                  "original_title": "xp_text: ./movie/filmAlias",
-                  "original_available": "xp_text: ./movie/pubDate",
-                  "summary": "xp_text: ./movie/dra",
+                  "title": "['xp_text', './movie/nm']",
+                  "tagline": "['xp_text', './movie/enm']",
+                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                  "summary": "['xp_text', './movie/dra']",
                   "certificate": "",
-                  "genre": "xp_texts: ./movie/cat",
-                  "actor": "xp_texts: ./movie/star",
-                  "writer": "xp_texts: ./movie/dir",
-                  "director": "xp_texts: ./movie/dir",
+                  "genre": "['xp_text', './movie/cat', 'split', ',']",
+                  "actor": "['xp_text', './movie/star', 'split', ',']",
+                  "writer": ["unknown"],
+                  "director": "['xp_text', './movie/dir', 'split', ',']",
                   "extra": {
                     "[plugin_id]": {
                       "rating": {
-                        "[plugin_id]": "xp_text: ./movie/sc"
+                        "[plugin_id]": "['xp_text', './movie/sc']"
                       },
-                      "poster": "xp_texts: ./movie/img",
-                      "backdrop": "xp_texts: ./movie/img"
+                      "poster": "['xp_texts', './movie/img']",
+                      "backdrop": "['xp_texts', './movie/img']"
                     }
                   }
                 }

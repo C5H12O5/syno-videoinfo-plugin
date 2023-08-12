@@ -1,11 +1,23 @@
 """Utility functions for this package."""
 import json
 import re
+import time
 from html.parser import HTMLParser
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 from xml.etree import ElementTree
 
 from scraper.exceptions import ResultParseError
+
+
+def strftime(timestamp: Union[str, int, float], pattern: str) -> str:
+    """Format a timestamp with the given pattern."""
+    if isinstance(timestamp, str):
+        timestamp = float(timestamp)
+
+    if timestamp >= 1000000000000:
+        timestamp /= 1000
+
+    return time.strftime(pattern, time.localtime(timestamp))
 
 
 def dict_update(d: dict, u: dict) -> dict:
