@@ -6,6 +6,8 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/C5H12O5/syno-videoinfo-plugin)
 [![GitHub license](https://img.shields.io/github/license/C5H12O5/syno-videoinfo-plugin)](LICENSE)
 
+##### 📖 English | 📖 [简体中文](README.zh-CN.md)
+
 This project is a video information plugin for Synology Video Station. It provides a way to fetch metadata from websites
 other than the default ones.
 
