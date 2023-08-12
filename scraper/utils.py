@@ -33,7 +33,7 @@ def str_to_etree(string: str) -> Optional[ElementTree.Element]:
     """Convert a string to an ElementTree."""
     string = string.strip()
     if string.startswith("{") or string.startswith("["):
-        return json_to_etree(json.loads(string))
+        return json_to_etree(json.loads(string, strict=False))
     elif string.startswith("<"):
         return html_to_etree(string)
     return None

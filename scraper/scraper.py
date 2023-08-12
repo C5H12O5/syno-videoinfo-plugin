@@ -83,8 +83,8 @@ def _start(flow: "ScrapeFlow", limit: int):
                     _results.append(next(result_gen))
                 except StopIteration:
                     break
-    except ScrapeError as e:
-        _logger.error("Error while scraping: %s", e)
+    except ScrapeError:
+        _logger.error("Failed to scrape from %s", flow.site, exc_info=True)
 
 
 class ScrapeFlow:
