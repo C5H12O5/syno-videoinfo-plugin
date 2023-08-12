@@ -1,0 +1,68 @@
+{
+  "type": "tvshow",
+  "site": "maoyan.com",
+  "steps": [
+    {
+      "http": {
+        "url": "https://i.maoyan.com/apollo/ajax/search?kw={title}&cityId=1&stype=-1",
+        "method": "GET",
+        "headers": {
+          "Host": "i.maoyan.com",
+          "Referer": "https://i.maoyan.com/apollo/search?searchtype=movie&$from=maoyan",
+          "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['xp_texts', './movies/list//id']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "https://i.maoyan.com/asgard/movie/{id}?_v_=yes&channelId=1&cityId=1",
+              "method": "GET",
+              "headers": {
+                "Host": "i.maoyan.com",
+                "Referer": "https://i.maoyan.com/apollo/search?searchtype=movie&$from=maoyan",
+                "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "from": "['re_match', 'var AppData = (.*?);\\s*</script>']",
+              "into": {
+                "tvshow": {
+                  "title": "['xp_text', './movie/nm']",
+                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                  "summary": "['xp_text', './movie/dra']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "poster": "['xp_texts', './movie/img']",
+                      "backdrop": "['xp_texts', './movie/img']"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "retval": "tvshow"
+          }
+        ]
+      }
+    }
+  ]
+}
