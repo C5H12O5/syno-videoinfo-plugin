@@ -18,7 +18,6 @@ _configpath = os.path.join(_basedir, "../scrapeflows")
 
 # define maximum number of results to return
 _maxlimit = 10
-_lock = threading.Lock()
 _results: List[Any] = []
 
 
@@ -76,13 +75,12 @@ def _start(flow: "ScrapeFlow", limit: int):
     try:
         result_gen = flow.start()
         while True:
-            with _lock:
-                if len(_results) >= limit:
-                    break
-                try:
-                    _results.append(next(result_gen))
-                except StopIteration:
-                    break
+            if len(_results) >= limit:
+                break
+            try:
+                _results.append(next(result_gen))
+            except StopIteration:
+                break
     except ScrapeError:
         _logger.error("Failed to scrape from %s", flow.site, exc_info=True)
 

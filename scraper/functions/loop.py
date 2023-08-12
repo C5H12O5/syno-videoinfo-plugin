@@ -39,6 +39,6 @@ def loop(args: LoopArgs, context: dict) -> Generator:
             args.source[i] = subcontext[args.item]
         except Exception as e:
             if args.iferr == "continue":
-                _logger.exception("Error occurred in loop")
+                _logger.error("Error occurred in loop", exc_info=True)
                 continue
             raise e
