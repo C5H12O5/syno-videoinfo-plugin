@@ -1,15 +1,20 @@
 """The implementation of the collect function."""
+import ast
 import logging
 import re
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 
 from scraper.exceptions import ResultParseError
 from scraper.functions import Args, Func
-from scraper.utils import deep_update, str_to_etree, strip
+from scraper.utils import dict_update, re_sub, str_to_etree, strip
 
 _logger = logging.getLogger(__name__)
+
+# define the valid string template pattern
+_pattern = re.compile(r"\s*\[.*]\s*")
 
 
 @dataclass(init=False)
@@ -44,7 +49,7 @@ def collect(args: CollectArgs, context: dict) -> None:
         if isinstance(target, list) and isinstance(result, list):
             target.extend(result)
         elif isinstance(target, dict) and isinstance(result, dict):
-            deep_update(target, result)
+            dict_update(target, result)
         else:
             context[ctxkey] = result
         _logger.info('Collected "%s" using "%s"', ctxkey, tmpl)
@@ -69,21 +74,27 @@ def _render_str(tmpl: str, source, etree):
     """Render a string template with the given source."""
     if len(tmpl.strip()) == 0:
         return ""
-    elif ":" not in tmpl:
+    elif re.fullmatch(_pattern, tmpl) is None:
         return tmpl
 
-    # split template into strategy and expression
-    strategy, expr = [s.strip() for s in tmpl.split(":", 1)]
+    # evaluate the string template to get strategy and arguments
+    finder, expr, *modification = ast.literal_eval(tmpl)
+
+    # find result from source
+    result = None
     if isinstance(source, str):
-        if strategy.startswith("xp_"):
-            return strip(_xpath_find(strategy[3:], expr, etree))
-        elif strategy.startswith("re_"):
-            return strip(_regex_match(strategy[3:], expr, source))
-    elif isinstance(source, dict):
-        if strategy == "get":
-            return source.get(expr)
-    else:
-        return None
+        if finder.startswith("xp_"):
+            result = _xpath_find(finder[3:], expr, etree)
+        elif finder.startswith("re_"):
+            result = _regex_match(finder[3:], expr, source)
+    elif isinstance(source, dict) and finder == "get":
+        result = source.get(expr)
+
+    # modify result if needed
+    if result is not None and len(modification) > 0:
+        modifier, *args = modification
+        result = _modify(result, modifier, args)
+    return strip(result)
 
 
 def _need_etree(tmpl: Any):
@@ -93,11 +104,11 @@ def _need_etree(tmpl: Any):
     elif isinstance(tmpl, dict):
         return any(_need_etree(v) for v in tmpl.values())
     elif isinstance(tmpl, str):
-        return ":" in tmpl and tmpl.split(":", 1)[0].startswith("xp_")
+        return "xp_" in tmpl
     return False
 
 
-def _xpath_find(strategy: str, expr: str, etree):
+def _xpath_find(strategy: str, expr: str, etree: Element):
     """Find strings in an element tree using xpath."""
     if strategy == "elem":
         elem = etree.find(expr)
@@ -129,3 +140,14 @@ def _regex_match(strategy: str, expr: str, source: str):
     elif strategy == "matches":
         return pattern.findall(source)
     return None
+
+
+def _modify(result: Any, strategy: str, args: list):
+    """Modify the result using the given strategy and arguments."""
+    if strategy == "split" and len(args) == 1:
+        sep = args[0]
+        result = result.split(sep) if isinstance(result, str) else result
+    elif strategy == "re_sub" and len(args) == 2:
+        pattern, repl = args
+        result = re_sub(result, pattern, repl)
+    return result

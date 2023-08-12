@@ -17,7 +17,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "re_matches: 电视剧].*?sid:\\s*(\\d+)\\s*,"
+          "ids": "['re_matches', '电视剧].*?sid:\\s*(\\d+)\\s*,']"
         }
       }
     },
@@ -40,16 +40,16 @@
           {
             "collect": {
               "source": "subject",
-              "from": "xp_text: .//script[@type='application/ld+json']",
+              "from": "['xp_text', './/script[@type=\"application/ld+json\"]']",
               "into": {
                 "tvshow": {
-                  "title": "xp_text: ./name",
+                  "title": "['xp_text', './name']",
                   "original_title": "",
-                  "original_available": "xp_text: ./datePublished",
+                  "original_available": "['xp_text', './datePublished']",
                   "extra": {
                     "[plugin_id]": {
-                      "poster": "xp_texts: ./image",
-                      "backdrop": "xp_texts: ./image"
+                      "poster": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']",
+                      "backdrop": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']"
                     }
                   }
                 }
@@ -61,16 +61,9 @@
               "source": "subject",
               "into": {
                 "tvshow": {
-                  "summary": "xp_text: .//span[@property='v:summary']"
+                  "summary": "['xp_text', './/span[@property=\"v:summary\"]']"
                 }
               }
-            }
-          },
-          {
-            "replace": {
-              "source": "tvshow",
-              "pattern": "(.+/photo)/s_ratio_poster/(public/.+)",
-              "replacement": "\\1/m/\\2"
             }
           },
           {
