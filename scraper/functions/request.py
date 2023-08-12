@@ -16,11 +16,9 @@ from scraper.functions import Args, Func
 
 _logger = logging.getLogger(__name__)
 
-
 # define default HTTP cache configuration
 _basedir = os.path.dirname(os.path.realpath(__file__))
-_cache_name = ".httpcache"
-_cache_file = os.path.join(_basedir, _cache_name)
+_cache_prefix = ".cache_"
 _cache_expire = 86400
 
 # define a global opener and install it to urllib.request
@@ -75,15 +73,16 @@ class HttpArgs(Args):
 
 @Func("http", HttpArgs)
 def http(args: HttpArgs, context: dict) -> None:
+    cache_name = _cache_prefix + context["site"]
     # send the HTTP request
     response = _http_request(
-        args.url, args.method, args.headers, args.body, args.timeout
+        args.url, args.method, args.headers, args.body, args.timeout, cache_name
     )
     # put the response into the context
     context[args.result] = response
 
 
-def _http_request(url, method, headers, body, timeout):
+def _http_request(url, method, headers, body, timeout, cache_name):
     """Send an HTTP request and return the response body."""
     _logger.info("HTTP request: %s %s", method, url)
     _logger.debug("==>  headers: %s", headers)
@@ -92,14 +91,14 @@ def _http_request(url, method, headers, body, timeout):
     # check if the cache is expired
     shelve_flag = "c"  # creating database if not exist
     for filename in os.listdir(_basedir):
-        if filename.startswith(_cache_name):
+        if filename.startswith(cache_name):
             shelve_file = os.path.join(_basedir, filename)
             modify_time = os.path.getmtime(shelve_file)
             if (time.time() - modify_time) > _cache_expire:
                 shelve_flag = "n"  # always create a new, empty database
 
     # send the request and cache the response
-    with shelve.open(_cache_file, shelve_flag) as cache:
+    with shelve.open(os.path.join(_basedir, cache_name), shelve_flag) as cache:
         cache_key = url + str(body)
         if cache_key in cache:
             response_body = cache[cache_key]

@@ -112,6 +112,8 @@ class ScrapeFlow:
                 if flowdef["type"] != videotype:
                     continue
                 # generate a flow instance from the definition
-                yield ScrapeFlow(
-                    flowdef["site"], list(flowdef["steps"]), initialval.copy()
-                )
+                site = flowdef["site"]
+                steps = list(flowdef["steps"])
+                context = initialval.copy()
+                context["site"] = site
+                yield ScrapeFlow(site, steps, context)

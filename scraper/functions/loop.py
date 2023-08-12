@@ -29,7 +29,11 @@ class LoopArgs(Args):
 def loop(args: LoopArgs, context: dict) -> Generator:
     """Loop over a list of items and execute steps."""
     for i in range(len(args.source)):
-        subcontext = {args.item: args.source[i], "$parent": context}
+        subcontext = {
+            "$parent": context,
+            "site": context["site"],
+            args.item: args.source[i]
+        }
         try:
             for funcname, rawargs in args.steps:
                 # execute the function with subcontext

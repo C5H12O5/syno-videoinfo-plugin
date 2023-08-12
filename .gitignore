@@ -380,4 +380,4 @@ cython_debug/
 
 # syno-videoinfo-plugin
 INFO
-.httpcache*
+.cache_*
