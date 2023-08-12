@@ -44,7 +44,6 @@
               "into": {
                 "tvshow": {
                   "title": "['xp_text', './name']",
-                  "original_title": "",
                   "original_available": "['xp_text', './datePublished']",
                   "extra": {
                     "[plugin_id]": {

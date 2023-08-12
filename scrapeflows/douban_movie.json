@@ -17,7 +17,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "re_matches: 电影].*?sid:\\s*(\\d+)\\s*,"
+          "ids": "['re_matches', '电影].*?sid:\\s*(\\d+)\\s*,']"
         }
       }
     },
@@ -40,25 +40,24 @@
           {
             "collect": {
               "source": "subject",
-              "from": "xp_text: .//script[@type='application/ld+json']",
+              "from": "['xp_text', './/script[@type=\"application/ld+json\"]']",
               "into": {
                 "movie": {
-                  "title": "xp_text: ./name",
+                  "title": "['xp_text', './name']",
                   "tagline": "",
-                  "original_title": "",
-                  "original_available": "xp_text: ./datePublished",
+                  "original_available": "['xp_text', './datePublished']",
                   "certificate": "",
-                  "genre": "xp_texts: ./genre/*",
-                  "actor": "xp_texts: ./actor//name",
-                  "writer": "xp_texts: ./author//name",
-                  "director": "xp_texts: ./director//name",
+                  "genre": "['xp_texts', './genre/*']",
+                  "actor": "['xp_texts', './actor//name']",
+                  "writer": "['xp_texts', './author//name']",
+                  "director": "['xp_texts', './director//name']",
                   "extra": {
                     "[plugin_id]": {
                       "rating": {
-                        "[plugin_id]": "xp_text: .//ratingValue"
+                        "[plugin_id]": "['xp_text', './/ratingValue']"
                       },
-                      "poster": "xp_texts: ./image",
-                      "backdrop": "xp_texts: ./image"
+                      "poster": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']",
+                      "backdrop": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']"
                     }
                   }
                 }
@@ -70,16 +69,9 @@
               "source": "subject",
               "into": {
                 "movie": {
-                  "summary": "xp_text: .//span[@property='v:summary']"
+                  "summary": "['xp_text', './/span[@property=\"v:summary\"]']"
                 }
               }
-            }
-          },
-          {
-            "replace": {
-              "source": "movie",
-              "pattern": "(.+/photo)/s_ratio_poster/(public/.+)",
-              "replacement": "\\1/m/\\2"
             }
           },
           {
