@@ -18,7 +18,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "movies": "xelems: ./movies/list/*"
+          "movies": "xp_elems: ./movies/list/*"
         }
       }
     },
@@ -31,7 +31,7 @@
             "collect": {
               "source": "base",
               "into": {
-                "id": "xtext: ./id"
+                "id": "xp_text: ./id"
               }
             }
           },
@@ -50,26 +50,26 @@
           {
             "collect": {
               "source": "subject",
-              "from": "match: var AppData = (.*?);\\s*</script>",
+              "from": "re_match: var AppData = (.*?);\\s*</script>",
               "into": {
                 "movie": {
-                  "title": "xtext: ./movie/nm",
-                  "tagline": "xtext: ./movie/filmAlias",
-                  "original_title": "xtext: ./movie/enm",
+                  "title": "xp_text: ./movie/nm",
+                  "tagline": "xp_text: ./movie/filmAlias",
+                  "original_title": "xp_text: ./movie/enm",
                   "original_available": "1992-09-01",
-                  "summary": "xtext: ./movie/dra",
+                  "summary": "xp_text: ./movie/dra",
                   "certificate": "",
-                  "genre": "xtexts: ./movie/cat",
-                  "actor": "xtexts: ./movie/star",
-                  "writer": "xtexts: ./movie/dir",
-                  "director": "xtexts: ./movie/dir",
+                  "genre": "xp_texts: ./movie/cat",
+                  "actor": "xp_texts: ./movie/star",
+                  "writer": "xp_texts: ./movie/dir",
+                  "director": "xp_texts: ./movie/dir",
                   "extra": {
                     "[plugin_id]": {
                       "rating": {
-                        "[plugin_id]": "xtext: ./movie/sc"
+                        "[plugin_id]": "xp_text: ./movie/sc"
                       },
-                      "poster": "xtexts: ./movie/img",
-                      "backdrop": "xtexts: ./movie/img"
+                      "poster": "xp_texts: ./movie/img",
+                      "backdrop": "xp_texts: ./movie/img"
                     }
                   }
                 }

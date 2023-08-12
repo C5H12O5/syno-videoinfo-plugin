@@ -17,7 +17,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "matches: 电影].*?sid:\\s*(\\d+)\\s*,"
+          "ids": "re_matches: 电影].*?sid:\\s*(\\d+)\\s*,"
         }
       }
     },
@@ -40,24 +40,24 @@
           {
             "collect": {
               "source": "subject",
-              "from": "xtext: .//script[@type='application/ld+json']",
+              "from": "xp_text: .//script[@type='application/ld+json']",
               "into": {
                 "movie": {
-                  "title": "xtext: ./name",
+                  "title": "xp_text: ./name",
                   "tagline": "",
-                  "original_available": "xtext: ./datePublished",
+                  "original_available": "xp_text: ./datePublished",
                   "certificate": "",
-                  "genre": "xtexts: ./genre/*",
-                  "actor": "xtexts: ./actor//name",
-                  "writer": "xtexts: ./author//name",
-                  "director": "xtexts: ./director//name",
+                  "genre": "xp_texts: ./genre/*",
+                  "actor": "xp_texts: ./actor//name",
+                  "writer": "xp_texts: ./author//name",
+                  "director": "xp_texts: ./director//name",
                   "extra": {
                     "[plugin_id]": {
                       "rating": {
-                        "[plugin_id]": "xtext: .//ratingValue"
+                        "[plugin_id]": "xp_text: .//ratingValue"
                       },
-                      "poster": "xtexts: ./image",
-                      "backdrop": "xtexts: ./image"
+                      "poster": "xp_texts: ./image",
+                      "backdrop": "xp_texts: ./image"
                     }
                   }
                 }
@@ -69,7 +69,7 @@
               "source": "subject",
               "into": {
                 "movie": {
-                  "summary": "xtext: .//span[@property='v:summary']"
+                  "summary": "xp_text: .//span[@property='v:summary']"
                 }
               }
             }

@@ -39,6 +39,7 @@ def collect(args: CollectArgs, context: dict) -> None:
         except Exception as e:
             _logger.error('Failed to collect "%s" using "%s"', ctxkey, tmpl)
             raise ResultParseError from e
+
         target = context.get(ctxkey)
         if isinstance(target, list) and isinstance(result, list):
             target.extend(result)
@@ -67,15 +68,16 @@ def _render_str(tmpl: str, source, etree):
     """Render a string template with the given source."""
     if len(tmpl.strip()) == 0:
         return ""
-    if ":" not in tmpl:
+    elif ":" not in tmpl:
         return tmpl
+
     # split template into strategy and expression
     strategy, expr = [s.strip() for s in tmpl.split(":", 1)]
     if isinstance(source, str):
-        if strategy.startswith("x"):
-            return strip(_xpath_find(strategy, expr, etree))
-        else:
-            return strip(_regex_match(strategy, expr, source))
+        if strategy.startswith("xp_"):
+            return strip(_xpath_find(strategy[3:], expr, etree))
+        elif strategy.startswith("re_"):
+            return strip(_regex_match(strategy[3:], expr, source))
     elif isinstance(source, dict):
         if strategy == "get":
             return source.get(expr)
@@ -90,28 +92,28 @@ def _need_etree(tmpl: Union[list, dict, str]):
     elif isinstance(tmpl, dict):
         return any(_need_etree(v) for v in tmpl.values())
     elif isinstance(tmpl, str):
-        return ":" in tmpl and tmpl.split(":", 1)[0].startswith("x")
+        return ":" in tmpl and tmpl.split(":", 1)[0].startswith("xp_")
     return False
 
 
 def _xpath_find(strategy: str, expr: str, etree):
     """Find strings in an element tree using xpath."""
-    if strategy == "xelem":
+    if strategy == "elem":
         elem = etree.find(expr)
         if elem is not None:
             return ElementTree.tostring(elem, encoding="unicode")
-    elif strategy == "xelems":
+    elif strategy == "elems":
         elist = etree.findall(expr)
         return [ElementTree.tostring(e, encoding="unicode") for e in elist]
-    elif strategy == "xtext":
+    elif strategy == "text":
         return etree.findtext(expr)
-    elif strategy == "xtexts":
+    elif strategy == "texts":
         return [e.text for e in etree.findall(expr)]
-    elif strategy.startswith("xattr_"):
+    elif strategy.startswith("attr_"):
         elem = etree.find(expr)
         if elem is not None:
             return elem.attrib[strategy[6:]]
-    elif strategy.startswith("xattrs_"):
+    elif strategy.startswith("attrs_"):
         elist = etree.findall(expr)
         return [e.attrib[strategy[7:]] for e in elist]
     return None

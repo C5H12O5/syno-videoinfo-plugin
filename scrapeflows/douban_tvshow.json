@@ -17,7 +17,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "matches: 电视剧].*?sid:\\s*(\\d+)\\s*,"
+          "ids": "re_matches: 电视剧].*?sid:\\s*(\\d+)\\s*,"
         }
       }
     },
@@ -40,15 +40,15 @@
           {
             "collect": {
               "source": "subject",
-              "from": "xtext: .//script[@type='application/ld+json']",
+              "from": "xp_text: .//script[@type='application/ld+json']",
               "into": {
                 "tvshow": {
-                  "title": "xtext: ./name",
-                  "original_available": "xtext: ./datePublished",
+                  "title": "xp_text: ./name",
+                  "original_available": "xp_text: ./datePublished",
                   "extra": {
                     "[plugin_id]": {
-                      "poster": "xtexts: ./image",
-                      "backdrop": "xtexts: ./image"
+                      "poster": "xp_texts: ./image",
+                      "backdrop": "xp_texts: ./image"
                     }
                   }
                 }
@@ -60,7 +60,7 @@
               "source": "subject",
               "into": {
                 "tvshow": {
-                  "summary": "xtext: .//span[@property='v:summary']"
+                  "summary": "xp_text: .//span[@property='v:summary']"
                 }
               }
             }
