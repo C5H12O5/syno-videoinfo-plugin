@@ -51,7 +51,7 @@ def collect(args: CollectArgs, context: dict) -> None:
         _logger.debug("<==  result: %s", context[ctxkey])
 
 
-def _render(tmpl: Union[list, dict, str], source, etree=None):
+def _render(tmpl: Any, source, etree=None):
     """Render a template with the given source."""
     if etree is None and _need_etree(tmpl):
         etree = str_to_etree(source)
@@ -62,6 +62,7 @@ def _render(tmpl: Union[list, dict, str], source, etree=None):
         return {k: _render(v, source, etree) for k, v in tmpl.items()}
     elif isinstance(tmpl, str):
         return _render_str(tmpl, source, etree)
+    return tmpl
 
 
 def _render_str(tmpl: str, source, etree):
@@ -85,7 +86,7 @@ def _render_str(tmpl: str, source, etree):
         return None
 
 
-def _need_etree(tmpl: Union[list, dict, str]):
+def _need_etree(tmpl: Any):
     """Check if the template needs an etree."""
     if isinstance(tmpl, list):
         return any(_need_etree(item) for item in tmpl)

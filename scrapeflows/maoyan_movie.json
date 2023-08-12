@@ -46,8 +46,8 @@
               "into": {
                 "movie": {
                   "title": "xp_text: ./movie/nm",
-                  "tagline": "xp_text: ./movie/filmAlias",
-                  "original_title": "xp_text: ./movie/enm",
+                  "tagline": "xp_text: ./movie/enm",
+                  "original_title": "xp_text: ./movie/filmAlias",
                   "original_available": "xp_text: ./movie/pubDate",
                   "summary": "xp_text: ./movie/dra",
                   "certificate": "",
