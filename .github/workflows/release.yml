@@ -1,0 +1,23 @@
+name: Release Python Package
+
+on:
+  push:
+    tags:
+      - v[0-9]*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8' 
+    - name: Build Package
+      run: python setup.py sdist --formats=zip
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "dist/*.zip"
