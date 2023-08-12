@@ -1,5 +1,6 @@
 """Utility functions for this package."""
 import json
+import re
 from html.parser import HTMLParser
 from typing import Any, List, Optional
 from xml.etree import ElementTree
@@ -7,18 +8,18 @@ from xml.etree import ElementTree
 from scraper.exceptions import ResultParseError
 
 
-def deep_update(d: dict, u: dict):
+def dict_update(d: dict, u: dict) -> dict:
     """Recursively update a dictionary."""
     for k, v in u.items():
         if k in d and isinstance(d[k], dict) and isinstance(v, dict):
-            d[k] = deep_update(d[k], v)
+            d[k] = dict_update(d[k], v)
         else:
             d[k] = v
     return d
 
 
-def strip(obj: Any):
-    """Strip leading and trailing whitespace."""
+def strip(obj: Any) -> Any:
+    """Recursively strip a string, list, or dict."""
     if isinstance(obj, list):
         return list(filter(lambda x: x is not None, [strip(i) for i in obj]))
     elif isinstance(obj, dict):
@@ -26,6 +27,17 @@ def strip(obj: Any):
     elif isinstance(obj, str):
         obj = obj.strip()
         return obj if obj != "" else None
+    return obj
+
+
+def re_sub(obj: Any, pattern: str, repl: str) -> Any:
+    """Recursively replace a pattern in a string, list, or dict."""
+    if isinstance(obj, list):
+        return [re_sub(item, pattern, repl) for item in obj]
+    elif isinstance(obj, dict):
+        return {k: re_sub(v, pattern, repl) for k, v in obj.items()}
+    elif isinstance(obj, str):
+        return re.sub(pattern, repl, obj)
     return obj
 
 
@@ -42,12 +54,12 @@ def str_to_etree(string: str) -> Optional[ElementTree.Element]:
 def json_to_etree(json_obj: Any, tag: str = "root"):
     """Convert a JSON object to an ElementTree."""
     element = ElementTree.Element(tag)
-    if isinstance(json_obj, dict):
-        for k, v in json_obj.items():
-            element.append(json_to_etree(v, k))
-    elif isinstance(json_obj, list):
+    if isinstance(json_obj, list):
         for i, item in enumerate(json_obj):
             element.append(json_to_etree(item, f"i{str(i)}"))
+    elif isinstance(json_obj, dict):
+        for k, v in json_obj.items():
+            element.append(json_to_etree(v, k))
     elif json_obj is not None:
         element.text = str(json_obj)
     return element
