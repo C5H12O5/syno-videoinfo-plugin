@@ -18,23 +18,15 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "movies": "xp_elems: ./movies/list/*"
+          "ids": "xp_texts: ./movies/list//id"
         }
       }
     },
     {
       "loop": {
-        "source": "movies",
-        "item": "base",
+        "source": "ids",
+        "item": "id",
         "steps": [
-          {
-            "collect": {
-              "source": "base",
-              "into": {
-                "id": "xp_text: ./id"
-              }
-            }
-          },
           {
             "http": {
               "url": "https://i.maoyan.com/asgard/movie/{id}?_v_=yes&channelId=1&cityId=1",
@@ -56,7 +48,7 @@
                   "title": "xp_text: ./movie/nm",
                   "tagline": "xp_text: ./movie/filmAlias",
                   "original_title": "xp_text: ./movie/enm",
-                  "original_available": "1992-09-01",
+                  "original_available": "xp_text: ./movie/pubDate",
                   "summary": "xp_text: ./movie/dra",
                   "certificate": "",
                   "genre": "xp_texts: ./movie/cat",

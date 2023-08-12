@@ -45,6 +45,7 @@
                 "episode": {
                   "title": "xp_text: ./name",
                   "tagline": "",
+                  "original_title": "",
                   "original_available": "xp_text: ./datePublished",
                   "certificate": "",
                   "genre": "xp_texts: ./genre/*",
