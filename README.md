@@ -53,7 +53,7 @@ $ git clone https://github.com/C5H12O5/syno-videoinfo-plugin
 2. Modify the code as you want, and test it like this:
 
 ```sh
-$ python main.py --type movie --lang enu --input "{\"title\":\"{movie title}\"}" --limit 1
+$ python main.py --type movie --input "{\"title\":\"{movie title}\"}" --limit 1 --loglevel debug
 ```
 
 3. Package the plugin using the following command:

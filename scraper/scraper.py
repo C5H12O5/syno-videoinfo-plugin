@@ -26,7 +26,7 @@ def scrape(plugin_id: str) -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
     parser.add_argument("--type", type=str, required=True)
-    parser.add_argument("--lang", type=str, required=True)
+    parser.add_argument("--lang", type=str, required=False)
     parser.add_argument("--limit", type=int, default=_maxlimit)
     parser.add_argument("--allowguess", action="store_true", default=False)
     parser.add_argument("--configpath", type=str, default=_configpath)
