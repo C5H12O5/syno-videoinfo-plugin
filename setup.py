@@ -20,15 +20,15 @@ info_tmpl = """
   "language": ["chs"],
   "test_example": {
     "movie": {
-      "title": "两杆大烟枪 Lock, Stock and Two Smoking Barrels",
+      "title": "两杆大烟枪",
       "original_available": "1998-08-28"
     },
     "tvshow": {
-      "title": "怪奇物语 第一季 Stranger Things Season 1",
+      "title": "怪奇物语 第一季",
       "original_available": "2016-07-15"
     },
     "tvshow_episode": {
-      "title": "怪奇物语 第一季 Stranger Things Season 1",
+      "title": "怪奇物语 第一季",
       "original_available": "2016-07-15",
       "season": 1,
       "episode": 1
