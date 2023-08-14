@@ -2,7 +2,7 @@
 import os
 import string
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 from version import version
 
@@ -44,7 +44,11 @@ with open(os.path.join(root_dir, "INFO"), "w", encoding="utf-8") as writer:
 setup(
     name=plugin_id,
     version=version(),
-    packages=["", "scraper", "scraper.functions", "scrapeflows"],
-    package_data={"": ["run.sh", "main.py", "INFO"], "scrapeflows": ["*.json"]},
+    packages=find_packages(),
+    package_data={
+        "": ["run.sh", "INFO"],
+        "scrapeflows": ["*.json"],
+        "configserver": ["*.html"]
+    },
     python_requires=">=3.7",
 )
