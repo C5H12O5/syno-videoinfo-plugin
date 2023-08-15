@@ -18,7 +18,7 @@ done
 
 port=5125
 if ! netstat -tuln | grep ":$port" >/dev/null; then
-	nohup /usr/bin/env python3 "$BASEDIR"/configserver/start.py > /dev/null 2>&1 &
+	nohup /usr/bin/env python3 "$BASEDIR"/configserver/serve.py > /dev/null 2>&1 &
 fi
 
 eval "/usr/bin/env python3 $BASEDIR/main.py $ARGV"
