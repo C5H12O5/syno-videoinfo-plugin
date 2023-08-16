@@ -104,14 +104,39 @@ class ScrapeFlow:
     @staticmethod
     def load(path: str, videotype: str, initialval: dict):
         """Load scrape flows from given path."""
+
+        saved_conf = None
+        conf_path = _basedir / "../scrapeflows.conf"
+        if conf_path.exists():
+            with open(conf_path, "r", encoding="utf-8") as reader:
+                saved_conf = json.load(reader)
+
         for filepath in Path(path).glob("*.json"):
             with open(filepath, "r", encoding="utf-8") as flowdef_json:
                 flowdef = json.load(flowdef_json)
-                if flowdef["type"] != videotype:
-                    continue
-                # generate a flow instance from the definition
-                site = flowdef["site"]
-                steps = list(flowdef["steps"])
-                context = initialval.copy()
-                context["site"] = site
-                yield ScrapeFlow(site, steps, context)
+
+            # filter out flows that do not match the video type
+            if not ScrapeFlow.valid(flowdef, videotype, saved_conf):
+                continue
+
+            # generate a flow instance from the definition
+            site = flowdef["site"]
+            steps = list(flowdef["steps"])
+            context = initialval.copy()
+            context["site"] = site
+            yield ScrapeFlow(site, steps, context)
+
+    @staticmethod
+    def valid(flowdef: Any, videotype: str, conf: Any):
+        """Check if the flow definition is valid."""
+        if flowdef["type"] != videotype:
+            return False
+
+        site = flowdef["site"]
+        if conf is not None and site in conf:
+            site_conf = conf[site]
+            types = site_conf["types"]
+            if not any(videotype.startswith(t) for t in types):
+                return False
+
+        return True

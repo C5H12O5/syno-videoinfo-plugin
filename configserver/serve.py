@@ -27,12 +27,12 @@ def render_index(saved_conf=None):
             "tvshow": "selected" if "tvshow" in types else "disabled",
             "priority": 999,
         }
-        saved = saved_conf.get(site) if saved_conf is not None else None
-        if saved is not None:
-            saved_types = saved["types"]
+        site_conf = saved_conf.get(site) if saved_conf is not None else None
+        if site_conf is not None:
+            saved_types = site_conf["types"]
             source["movie"] = "selected" if "movie" in saved_types else ""
             source["tvshow"] = "selected" if "tvshow" in saved_types else ""
-            source["priority"] = saved["priority"]
+            source["priority"] = site_conf["priority"]
         source_html += _source_tmpl.substitute(source)
 
     return _index_tmpl.substitute(sources=source_html)
@@ -66,9 +66,9 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
 
-            conf = _basedir / "../scrapeflows.conf"
-            if conf.exists():
-                with open(conf, "r", encoding="utf-8") as reader:
+            conf_path = _basedir / "../scrapeflows.conf"
+            if conf_path.exists():
+                with open(conf_path, "r", encoding="utf-8") as reader:
                     saved_conf = json.load(reader)
                 self.wfile.write(render_index(saved_conf).encode("utf-8"))
             else:
