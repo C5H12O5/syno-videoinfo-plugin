@@ -44,7 +44,13 @@ with open(root_dir / "INFO", "w", encoding="utf-8") as writer:
 setup(
     name=plugin_id,
     version=version(),
-    packages=["", "scraper", "scrapeflows", "configserver"],
+    packages=[
+        "",
+        "scraper",
+        "scraper.functions",
+        "scrapeflows",
+        "configserver"
+    ],
     package_data={
         "": ["run.sh", "INFO"],
         "scrapeflows": ["*.json"],
