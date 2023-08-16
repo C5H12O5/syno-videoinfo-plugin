@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
     <title>Synology Video Info Plugin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
@@ -71,15 +71,15 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             M.AutoInit();
 
             var saveBtn = document.getElementById('save-btn');
-            saveBtn.addEventListener('click', function(event) {
+            saveBtn.addEventListener('click', event => {
                 event.preventDefault();
 
                 var data = {}
-                document.querySelectorAll('form').forEach(function(form) {
+                document.querySelectorAll('form').forEach(form => {
                     var selectElem = form.querySelector('select');
                     var selectInst = M.FormSelect.getInstance(selectElem);
                     var priorityElem = document.getElementById(form.id + '-priority');
@@ -95,18 +95,15 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                })
-                .then(response => {
+                }).then(response => {
                     if (!response.ok) {
                         throw new Error('HTTP error, status = ' + response.status);
                     }
                     return response.text();
-                })
-                .then(function(data) {
-                    M.toast({html: 'Save successful!', classes: 'center-align green lighten-2'})
-                })
-                .catch(function(error) {
-                    M.toast({html: 'Save failed!', classes: 'center-align red lighten-2'})
+                }).then(data => {
+                    M.toast({ html: 'Save successful!', classes: 'center-align green lighten-2' })
+                }).catch(error => {
+                    M.toast({ html: 'Save failed!', classes: 'center-align red lighten-2' })
                 });
             });
         });
