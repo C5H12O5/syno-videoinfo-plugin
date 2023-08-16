@@ -1,7 +1,6 @@
 """The implementation of the HTTP function."""
 import json
 import logging
-import os
 import shelve
 import time
 import urllib
@@ -9,6 +8,7 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from http.cookiejar import CookieJar
+from pathlib import Path
 from typing import Any
 
 from scraper.exceptions import RequestSendError
@@ -17,7 +17,7 @@ from scraper.functions import Args, Func
 _logger = logging.getLogger(__name__)
 
 # define default HTTP cache configuration
-_basedir = os.path.dirname(os.path.realpath(__file__))
+_basedir = Path(__file__).resolve().parent
 _cache_prefix = ".cache_"
 _cache_expire = 86400
 
@@ -90,15 +90,13 @@ def _http_request(url, method, headers, body, timeout, cache_name):
 
     # check if the cache is expired
     shelve_flag = "c"  # creating database if not exist
-    for filename in os.listdir(_basedir):
-        if filename.startswith(cache_name):
-            shelve_file = os.path.join(_basedir, filename)
-            modify_time = os.path.getmtime(shelve_file)
-            if (time.time() - modify_time) > _cache_expire:
-                shelve_flag = "n"  # always create a new, empty database
+    for cache_file in _basedir.glob("cache_name*"):
+        modify_time = cache_file.stat().st_mtime
+        if (time.time() - modify_time) > _cache_expire:
+            shelve_flag = "n"  # always create a new, empty database
 
     # send the request and cache the response
-    with shelve.open(os.path.join(_basedir, cache_name), shelve_flag) as cache:
+    with shelve.open(str(_basedir / cache_name), shelve_flag) as cache:
         cache_key = url + str(body)
         if cache_key in cache:
             response_body = cache[cache_key]

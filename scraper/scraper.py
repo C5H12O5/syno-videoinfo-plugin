@@ -2,9 +2,9 @@
 import argparse
 import json
 import logging
-import os
 import threading
 import time
+from pathlib import Path
 from typing import Any, List
 
 from scraper.exceptions import ScrapeError
@@ -13,8 +13,8 @@ from scraper.functions import findfunc
 _logger = logging.getLogger(__name__)
 
 # define default scraping config file path
-_basedir = os.path.dirname(os.path.realpath(__file__))
-_configpath = os.path.join(_basedir, "../scrapeflows")
+_basedir = Path(__file__).resolve().parent
+_configpath = _basedir / "../scrapeflows"
 
 # define maximum number of results to return
 _maxlimit = 10
@@ -29,7 +29,7 @@ def scrape(plugin_id: str) -> str:
     parser.add_argument("--lang", type=str, required=False)
     parser.add_argument("--limit", type=int, default=_maxlimit)
     parser.add_argument("--allowguess", action="store_true", default=False)
-    parser.add_argument("--configpath", type=str, default=_configpath)
+    parser.add_argument("--configpath", type=str, default=str(_configpath))
     parser.add_argument("--loglevel", type=str, default="critical")
     args = parser.parse_known_args()[0]
     maxlimit = min(args.limit, _maxlimit)
@@ -104,10 +104,8 @@ class ScrapeFlow:
     @staticmethod
     def load(path: str, videotype: str, initialval: dict):
         """Load scrape flows from given path."""
-        for filename in [f for f in os.listdir(path) if f.endswith(".json")]:
-            with open(
-                os.path.join(path, filename), "r", encoding="utf-8"
-            ) as flowdef_json:
+        for filepath in Path(path).glob("*.json"):
+            with open(filepath, "r", encoding="utf-8") as flowdef_json:
                 flowdef = json.load(flowdef_json)
                 if flowdef["type"] != videotype:
                     continue

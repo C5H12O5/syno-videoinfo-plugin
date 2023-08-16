@@ -1,10 +1,10 @@
 """Entry point for this plugin."""
-import os
+from pathlib import Path
 
 import scraper
 
 if __name__ == "__main__":
     # Prints the output of the scraper to the console.
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    plugin_id = os.path.basename(root_dir)
+    root_dir = Path(__file__).resolve().parent
+    plugin_id = root_dir.stem
     print(scraper.scrape(plugin_id))

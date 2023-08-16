@@ -8,7 +8,7 @@ from pathlib import Path
 
 _host = "0.0.0.0"
 _port = 5125
-_index_html = None
+_index_html = ""
 
 
 def init_server():
