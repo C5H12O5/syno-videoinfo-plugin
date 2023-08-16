@@ -5,7 +5,7 @@ import logging
 import threading
 import time
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Dict, List
 
 from scraper.exceptions import ScrapeError
 from scraper.functions import findfunc
@@ -56,13 +56,19 @@ def scrape(plugin_id: str) -> str:
 
     # load and execute scrape flows using multithreading
     start = time.time()
-    tasks = []
+    taskqueue: Dict[int, List[threading.Thread]] = {}
     for flow in ScrapeFlow.load(_flow_path, args.type, initialval):
         task = threading.Thread(target=_start, args=(flow, maxlimit))
+        tasks = taskqueue.get(flow.priority, [])
         tasks.append(task)
-        task.start()
-    for task in tasks:
-        task.join()
+        taskqueue[flow.priority] = tasks
+    for tasks in dict(sorted(taskqueue.items(), key=lambda x: x[0])).values():
+        if len(_results) >= maxlimit:
+            break
+        for task in tasks:
+            task.start()
+        for task in tasks:
+            task.join()
     end = time.time()
     _logger.info("Total execution time: %.3f seconds", end - start)
     return json.dumps(
