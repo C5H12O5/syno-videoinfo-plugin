@@ -12,9 +12,10 @@ from scraper.functions import findfunc
 
 _logger = logging.getLogger(__name__)
 
-# define default scraping config file path
+# define default scraping configuration path
 _basedir = Path(__file__).resolve().parent
-_configpath = _basedir / "../scrapeflows"
+_flow_path = _basedir / "../scrapeflows"
+_flowconf_path = _basedir / "../scrapeflows.conf"
 
 # define maximum number of results to return
 _maxlimit = 10
@@ -29,7 +30,6 @@ def scrape(plugin_id: str) -> str:
     parser.add_argument("--lang", type=str, required=False)
     parser.add_argument("--limit", type=int, default=_maxlimit)
     parser.add_argument("--allowguess", action="store_true", default=False)
-    parser.add_argument("--configpath", type=str, default=str(_configpath))
     parser.add_argument("--loglevel", type=str, default="critical")
     args = parser.parse_known_args()[0]
     maxlimit = min(args.limit, _maxlimit)
@@ -57,7 +57,7 @@ def scrape(plugin_id: str) -> str:
     # load and execute scrape flows using multithreading
     start = time.time()
     tasks = []
-    for flow in ScrapeFlow.load(args.configpath, args.type, initialval):
+    for flow in ScrapeFlow.load(_flow_path, args.type, initialval):
         task = threading.Thread(target=_start, args=(flow, maxlimit))
         tasks.append(task)
         task.start()
@@ -88,10 +88,11 @@ def _start(flow: "ScrapeFlow", limit: int):
 class ScrapeFlow:
     """A flow of steps to scrape video information."""
 
-    def __init__(self, site: str, steps: List[dict], context: dict):
+    def __init__(self, site: str, steps: list, context: dict, priority: int):
         self.site = site
         self.steps = steps
         self.context = context
+        self.priority = priority if priority is not None else 999
 
     def start(self):
         """Start the scrape flow and return a generator."""
@@ -102,41 +103,41 @@ class ScrapeFlow:
                 yield from iterable
 
     @staticmethod
-    def load(path: str, videotype: str, initialval: dict):
+    def load(path: Path, videotype: str, initialval: dict):
         """Load scrape flows from given path."""
 
-        saved_conf = None
-        conf_path = _basedir / "../scrapeflows.conf"
-        if conf_path.exists():
-            with open(conf_path, "r", encoding="utf-8") as reader:
-                saved_conf = json.load(reader)
+        flowconf = None
+        if _flowconf_path.exists():
+            with open(_flowconf_path, "r", encoding="utf-8") as reader:
+                flowconf = json.load(reader)
 
-        for filepath in Path(path).glob("*.json"):
+        for filepath in path.glob("*.json"):
             with open(filepath, "r", encoding="utf-8") as flowdef_json:
                 flowdef = json.load(flowdef_json)
+            site = flowdef["site"]
+            siteconf = None
+            if flowconf is not None and site in flowconf:
+                siteconf = flowconf[site]
 
             # filter out flows that do not match the video type
-            if not ScrapeFlow.valid(flowdef, videotype, saved_conf):
+            if not ScrapeFlow.valid(flowdef, videotype, siteconf):
                 continue
 
             # generate a flow instance from the definition
-            site = flowdef["site"]
             steps = list(flowdef["steps"])
             context = initialval.copy()
             context["site"] = site
-            yield ScrapeFlow(site, steps, context)
+            priority = siteconf["priority"] if siteconf is not None else None
+            yield ScrapeFlow(site, steps, context, priority)
 
     @staticmethod
-    def valid(flowdef: Any, videotype: str, conf: Any):
+    def valid(flowdef: Any, videotype: str, siteconf: Any):
         """Check if the flow definition is valid."""
         if flowdef["type"] != videotype:
             return False
 
-        site = flowdef["site"]
-        if conf is not None and site in conf:
-            site_conf = conf[site]
-            types = site_conf["types"]
-            if not any(videotype.startswith(t) for t in types):
+        if siteconf is not None:
+            if not any(videotype.startswith(t) for t in siteconf["types"]):
                 return False
 
         return True
