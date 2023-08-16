@@ -2,7 +2,7 @@
 import string
 from pathlib import Path
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 from version import version
 
@@ -44,7 +44,7 @@ with open(root_dir / "INFO", "w", encoding="utf-8") as writer:
 setup(
     name=plugin_id,
     version=version(),
-    packages=find_packages(),
+    packages=["", "scraper", "scrapeflows", "configserver"],
     package_data={
         "": ["run.sh", "INFO"],
         "scrapeflows": ["*.json"],
