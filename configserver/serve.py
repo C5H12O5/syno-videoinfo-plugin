@@ -64,6 +64,13 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.server.server_close()
             sys.exit()
 
+    def do_POST(self):
+        content_length = int(self.headers["Content-Length"])
+        body = self.rfile.read(content_length)
+        print(body)
+        self.send_response(200)
+        self.end_headers()
+
 
 if __name__ == "__main__":
     httpd = HTTPServer((_host, _port), RequestHandler)
