@@ -1,45 +1,51 @@
 """A simple HTTP server for configuration."""
 import http
 import json
-import os
 import string
 import sys
 from http.server import HTTPServer
-from typing import Any, Dict
+from pathlib import Path
 
-basedir = os.path.dirname(os.path.realpath(__file__))
+_host = "0.0.0.0"
+_port = 5125
+_index_html = None
 
-with open(
-    os.path.join(basedir, "templates/source.html"), "r", encoding="utf-8"
-) as html:
-    source_tmpl = string.Template(html.read())
 
-sites: Dict[Any, Any] = {}
-configpath = os.path.join(basedir, "../scrapeflows")
-for filename in [f for f in os.listdir(configpath) if f.endswith(".json")]:
-    with open(
-        os.path.join(configpath, filename), "r", encoding="utf-8"
-    ) as flowdef_json:
-        flowdef = json.load(flowdef_json)
-        site = flowdef["site"]
-        type_ = flowdef["type"].split("_", 1)[0]
-        types = sites.get(site, [])
-        if type_ not in types:
-            types.append(type_)
-        sites[site] = types
+def init_server():
+    """Initialize the server."""
+    global _index_html
+    basedir = Path(__file__).resolve().parent
 
-source_html = ""
-for site, types in sites.items():
-    movie = "selected" if "movie" in types else "disabled"
-    tvshow = "selected" if "tvshow" in types else "disabled"
-    source = {"site": site, "movie": movie, "tvshow": tvshow}
-    source_html += source_tmpl.substitute(source)
+    # get list of sites and types from flow definitions
+    sites = {}
+    for filepath in (basedir / "../scrapeflows").glob("*.json"):
+        with open(filepath, "r", encoding="utf-8") as flowdef_json:
+            flowdef = json.load(flowdef_json)
+            site = flowdef["site"]
+            type_ = flowdef["type"].split("_", 1)[0]
+            types = sites.get(site, [])
+            if type_ not in types:
+                types.append(type_)
+            sites[site] = types
 
-with open(
-    os.path.join(basedir, "templates/index.html"), "r", encoding="utf-8"
-) as html:
-    index_tmpl = string.Template(html.read())
-    indel_html = index_tmpl.substitute(sources=source_html)
+    # generate HTML for source list
+    source_html = ""
+    with open(basedir / "templates/source.html", "r", encoding="utf-8") as html:
+        source_tmpl = string.Template(html.read())
+    for site, types in sites.items():
+        movie = "selected" if "movie" in types else "disabled"
+        tvshow = "selected" if "tvshow" in types else "disabled"
+        source = {"site": site, "movie": movie, "tvshow": tvshow}
+        source_html += source_tmpl.substitute(source)
+
+    # generate HTML for index page
+    with open(basedir / "templates/index.html", "r", encoding="utf-8") as html:
+        index_tmpl = string.Template(html.read())
+        _index_html = index_tmpl.substitute(sources=source_html)
+
+
+# initialize the server
+init_server()
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -50,9 +56,9 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(indel_html.encode("utf-8"))
+            self.wfile.write(_index_html.encode("utf-8"))
 
-        elif self.path.endswith("/close"):
+        elif self.path.endswith("/exit"):
             self.send_response(200)
             self.wfile.write(b"Closing server...")
             self.server.server_close()
@@ -60,7 +66,5 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    host = "0.0.0.0"
-    port = 5125
-    httpd = HTTPServer((host, port), RequestHandler)
+    httpd = HTTPServer((_host, _port), RequestHandler)
     httpd.serve_forever()
