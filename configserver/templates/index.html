@@ -20,7 +20,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#exit" class="modal-trigger">
                         Exit
                         <ion-icon name="power"></ion-icon>
                     </a>
@@ -36,7 +36,7 @@
                     <h6>Metadata Sources:</h6>
                 </div>
                 <div class="col s6 right-align">
-                    <a href="#">
+                    <a href="#save" class="modal-trigger">
                         <ion-icon name="save" size="large"></ion-icon>
                     </a>
                 </div>
@@ -44,6 +44,26 @@
             <ul class="collapsible">
                 ${sources}
             </ul>
+        </div>
+    </div>
+
+    <div id="exit" class="modal">
+        <div class="modal-content">
+            <h6>Exit and close the page?</h6>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect btn-flat">Cancel</a>
+            <a href="/exit" class="modal-close waves-effect waves-red btn-flat">Confirm</a>
+        </div>
+    </div>
+
+    <div id="save" class="modal">
+        <div class="modal-content">
+            <h6>Save the changes?</h6>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect btn-flat">Cancel</a>
+            <a href="/save" class="modal-close waves-effect waves-green btn-flat">Confirm</a>
         </div>
     </div>
 
