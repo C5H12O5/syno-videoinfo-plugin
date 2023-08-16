@@ -1,15 +1,15 @@
 """Package script for this plugin."""
-import os
 import string
+from pathlib import Path
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 from version import version
 
-root_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = Path(__file__).resolve().parent
 
 # use the name of the root directory as the plugin id
-plugin_id = os.path.basename(root_dir)
+plugin_id = root_dir.name
 
 # write the INFO file for this plugin
 info_tmpl = """
@@ -20,15 +20,15 @@ info_tmpl = """
   "language": ["chs"],
   "test_example": {
     "movie": {
-      "title": "两杆大烟枪 Lock, Stock and Two Smoking Barrels",
+      "title": "两杆大烟枪",
       "original_available": "1998-08-28"
     },
     "tvshow": {
-      "title": "怪奇物语 第一季 Stranger Things Season 1",
+      "title": "怪奇物语 第一季",
       "original_available": "2016-07-15"
     },
     "tvshow_episode": {
-      "title": "怪奇物语 第一季 Stranger Things Season 1",
+      "title": "怪奇物语 第一季",
       "original_available": "2016-07-15",
       "season": 1,
       "episode": 1
@@ -36,7 +36,7 @@ info_tmpl = """
   }
 }
 """
-with open(os.path.join(root_dir, "INFO"), "w", encoding="utf-8") as writer:
+with open(root_dir / "INFO", "w", encoding="utf-8") as writer:
     template = string.Template(info_tmpl)
     writer.write(template.substitute(plugin_id=plugin_id, version=version()))
 
@@ -44,7 +44,11 @@ with open(os.path.join(root_dir, "INFO"), "w", encoding="utf-8") as writer:
 setup(
     name=plugin_id,
     version=version(),
-    packages=["", "scraper", "scraper.functions", "scrapeflows"],
-    package_data={"": ["run.sh", "main.py", "INFO"], "scrapeflows": ["*.json"]},
+    packages=find_packages(),
+    package_data={
+        "": ["run.sh", "INFO"],
+        "scrapeflows": ["*.json"],
+        "configserver": ["templates/*.html"],
+    },
     python_requires=">=3.7",
 )

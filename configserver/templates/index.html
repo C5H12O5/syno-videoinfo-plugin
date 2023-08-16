@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>Synology Video Info Plugin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+
+<body>
+    <nav class="light-blue lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a class="brand-logo">Synology Video Info Plugin</a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a href="https://github.com/C5H12O5/syno-videoinfo-plugin">
+                        GitHub
+                        <ion-icon name="open-outline"></ion-icon>
+                    </a>
+                </li>
+                <li>
+                    <a href="#exit" class="modal-trigger">
+                        Exit
+                        <ion-icon name="power"></ion-icon>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="section no-pad-bot">
+        <div class="container">
+            <div class="row">
+                <div class="col s6">
+                    <h6>Metadata Sources:</h6>
+                </div>
+                <div class="col s6 right-align">
+                    <a href="#save" class="modal-trigger">
+                        <ion-icon name="save" size="large"></ion-icon>
+                    </a>
+                </div>
+            </div>
+            <ul class="collapsible">
+                ${sources}
+            </ul>
+        </div>
+    </div>
+
+    <div id="exit" class="modal">
+        <div class="modal-content">
+            <h6>Exit and close the page?</h6>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect btn-flat">Cancel</a>
+            <a href="/exit" class="modal-close waves-effect waves-red btn-flat">Confirm</a>
+        </div>
+    </div>
+
+    <div id="save" class="modal">
+        <div class="modal-content">
+            <h6>Save the changes?</h6>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect btn-flat">Cancel</a>
+            <a id="save-btn" class="modal-close waves-effect waves-green btn-flat">Confirm</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            M.AutoInit();
+
+            var saveBtn = document.getElementById('save-btn');
+            saveBtn.addEventListener('click', event => {
+                event.preventDefault();
+
+                var data = {}
+                document.querySelectorAll('form').forEach(form => {
+                    var selectElem = form.querySelector('select');
+                    var selectInst = M.FormSelect.getInstance(selectElem);
+                    var priorityElem = document.getElementById(form.id + '-priority');
+                    data[form.id] = {
+                        types: selectInst.getSelectedValues(),
+                        priority: parseInt(priorityElem.value)
+                    }
+                });
+
+                fetch('/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP error, status = ' + response.status);
+                    }
+                    return response.text();
+                }).then(data => {
+                    M.toast({ html: 'Save successful!', classes: 'center-align green lighten-2' })
+                }).catch(error => {
+                    M.toast({ html: 'Save failed!', classes: 'center-align red lighten-2' })
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

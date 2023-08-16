@@ -18,7 +18,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "['xp_texts', './movies/list//id']"
+          "ids": "['re_matches', '\\\"id\\\":(\\d+),.*?\\\"movieType\\\":1']"
         }
       }
     },
@@ -46,7 +46,7 @@
               "into": {
                 "episode": {
                   "title": "['xp_text', './movie/nm']",
-                  "tagline": "['xp_text', './movie/enm']",
+                  "tagline": "",
                   "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
                   "summary": "['xp_text', './movie/dra']",
                   "certificate": "",

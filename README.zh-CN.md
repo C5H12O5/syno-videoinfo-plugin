@@ -25,7 +25,7 @@
 * DSM 7.0+
 * Video Station 3.0.0+
 
-## 相关文档
+## 参考文献
 
 * [视频元数据](https://kb.synology.cn/zh-cn/DSM/help/VideoStation/metadata?version=7)
 * [Video Station API 文档](https://download.synology.com/download/Document/Software/DeveloperGuide/Package/VideoStation/All/enu/Synology_Video_Station_API_enu.pdf)

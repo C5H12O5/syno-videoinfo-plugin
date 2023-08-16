@@ -381,3 +381,4 @@ cython_debug/
 # syno-videoinfo-plugin
 INFO
 .cache_*
+scrapeflows.conf

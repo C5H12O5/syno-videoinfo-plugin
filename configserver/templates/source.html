@@ -1,0 +1,27 @@
+<li>
+    <div class="collapsible-header valign-wrapper">
+        <ion-icon name="create-outline" size="large"></ion-icon>
+        <span class="center-align">${site}</span>
+    </div>
+    <div class="collapsible-body">
+        <div class="row">
+            <form id="${site}" class="col s12">
+                <div class="row">
+                    <div class="input-field col s9">
+                        <ion-icon class="prefix" name="layers"></ion-icon>
+                        <select multiple>
+                            <option value="movie" ${movie}>Movie</option>
+                            <option value="tvshow" ${tvshow}>TVShow</option>
+                        </select>
+                        <label>Enabled</label>
+                    </div>
+                    <div class="input-field col s3">
+                        <ion-icon class="prefix" name="swap-vertical"></ion-icon>
+                        <input id="${site}-priority" value="${priority}" type="number" class="validate">
+                        <label for="${site}-priority">Priority</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</li>
