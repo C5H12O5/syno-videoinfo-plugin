@@ -8,15 +8,38 @@ from pathlib import Path
 
 _host = "0.0.0.0"
 _port = 5125
-_index_html = ""
 _basedir = Path(__file__).resolve().parent
 
+# initialize the templates
+with open(_basedir / "templates/source.html", "r", encoding="utf-8") as html:
+    _source_tmpl = string.Template(html.read())
+with open(_basedir / "templates/index.html", "r", encoding="utf-8") as html:
+    _index_tmpl = string.Template(html.read())
 
-def init_server():
-    """Initialize the server."""
-    global _index_html
 
-    # get list of sites and types from flow definitions
+def render_index(saved_conf=None):
+    """Render the index page."""
+    source_html = ""
+    for site, types in load_sites().items():
+        source = {
+            "site": site,
+            "movie": "selected" if "movie" in types else "disabled",
+            "tvshow": "selected" if "tvshow" in types else "disabled",
+            "priority": 999,
+        }
+        saved = saved_conf.get(site) if saved_conf is not None else None
+        if saved is not None:
+            saved_types = saved["types"]
+            source["movie"] = "selected" if "movie" in saved_types else ""
+            source["tvshow"] = "selected" if "tvshow" in saved_types else ""
+            source["priority"] = saved["priority"]
+        source_html += _source_tmpl.substitute(source)
+
+    return _index_tmpl.substitute(sources=source_html)
+
+
+def load_sites():
+    """Load the list of sites and types from flow definitions."""
     sites = {}
     for filepath in (_basedir / "../scrapeflows").glob("*.json"):
         with open(filepath, "r", encoding="utf-8") as flowdef_json:
@@ -27,25 +50,11 @@ def init_server():
             if type_ not in types:
                 types.append(type_)
             sites[site] = types
-
-    # generate HTML for source list
-    source_html = ""
-    with open(_basedir / "templates/source.html", "r", encoding="utf-8") as html:
-        source_tmpl = string.Template(html.read())
-    for site, types in sites.items():
-        movie = "selected" if "movie" in types else "disabled"
-        tvshow = "selected" if "tvshow" in types else "disabled"
-        source = {"site": site, "movie": movie, "tvshow": tvshow}
-        source_html += source_tmpl.substitute(source)
-
-    # generate HTML for index page
-    with open(_basedir / "templates/index.html", "r", encoding="utf-8") as html:
-        index_tmpl = string.Template(html.read())
-        _index_html = index_tmpl.substitute(sources=source_html)
+    return sites
 
 
-# initialize the server
-init_server()
+# initialize the index page
+_index_html = render_index()
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -56,7 +65,14 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(_index_html.encode("utf-8"))
+
+            conf = _basedir / "../scrapeflows.conf"
+            if conf.exists():
+                with open(conf, "r", encoding="utf-8") as reader:
+                    saved_conf = json.load(reader)
+                self.wfile.write(render_index(saved_conf).encode("utf-8"))
+            else:
+                self.wfile.write(_index_html.encode("utf-8"))
 
         elif self.path.endswith("/exit"):
             self.send_response(200)
