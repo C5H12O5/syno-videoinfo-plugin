@@ -9,7 +9,7 @@ from version import version
 root_dir = Path(__file__).resolve().parent
 
 # use the name of the root directory as the plugin id
-plugin_id = root_dir.stem
+plugin_id = root_dir.name
 
 # write the INFO file for this plugin
 info_tmpl = """
@@ -48,7 +48,7 @@ setup(
     package_data={
         "": ["run.sh", "INFO"],
         "scrapeflows": ["*.json"],
-        "configserver": ["*.html"],
+        "configserver": ["templates/*.html"],
     },
     python_requires=">=3.7",
 )
