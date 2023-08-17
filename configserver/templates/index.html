@@ -53,7 +53,7 @@
         </div>
         <div class="modal-footer">
             <a class="modal-close waves-effect btn-flat">Cancel</a>
-            <a href="/exit" class="modal-close waves-effect waves-red btn-flat">Confirm</a>
+            <a id="exit-btn" class="modal-close waves-effect waves-red btn-flat">Confirm</a>
         </div>
     </div>
 
@@ -96,14 +96,27 @@
                     },
                     body: JSON.stringify(data)
                 }).then(response => {
-                    if (!response.ok) {
-                        throw new Error('HTTP error, status = ' + response.status);
+                    if (response.ok) {
+                        M.toast({ html: 'Save successful!', classes: 'center-align green lighten-2' })
+                    } else {
+                        throw new Error(response.statusText);
                     }
-                    return response.text();
-                }).then(data => {
-                    M.toast({ html: 'Save successful!', classes: 'center-align green lighten-2' })
                 }).catch(error => {
-                    M.toast({ html: 'Save failed!', classes: 'center-align red lighten-2' })
+                    M.toast({ html: error, classes: 'center-align red lighten-2' })
+                });
+            });
+
+            var exitBtn = document.getElementById('exit-btn');
+            exitBtn.addEventListener('click', event => {
+                event.preventDefault();
+
+                fetch('/exit').then(response => {
+                    M.toast({ html: 'Closing server...', classes: 'center-align red lighten-2' })
+                    setTimeout(function() {
+                        location.reload(true);
+                    }, 1500);
+                }).catch(error => {
+                    location.reload(true);
                 });
             });
         });
