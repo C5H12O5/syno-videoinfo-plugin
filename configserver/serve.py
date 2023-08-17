@@ -17,22 +17,23 @@ with open(_basedir / "templates/index.html", "r", encoding="utf-8") as html:
     _index_tmpl = string.Template(html.read())
 
 
-def render_index(saved_conf=None):
+def render_index(saved=None):
     """Render the index page."""
     source_html = ""
-    for site, types in load_sites().items():
+    for site, site_conf in load_sites().items():
+        types = site_conf["types"]
         source = {
             "site": site,
             "movie": "selected" if "movie" in types else "disabled",
             "tvshow": "selected" if "tvshow" in types else "disabled",
             "priority": 999,
         }
-        site_conf = saved_conf.get(site) if saved_conf is not None else None
-        if site_conf is not None:
-            saved_types = site_conf["types"]
+        saved_conf = saved.get(site) if saved is not None else None
+        if saved_conf is not None:
+            saved_types = saved_conf["types"]
             source["movie"] = "selected" if "movie" in saved_types else ""
             source["tvshow"] = "selected" if "tvshow" in saved_types else ""
-            source["priority"] = site_conf["priority"]
+            source["priority"] = saved_conf["priority"]
         source_html += _source_tmpl.substitute(source)
 
     return _index_tmpl.substitute(sources=source_html)
@@ -44,12 +45,24 @@ def load_sites():
     for filepath in (_basedir / "../scrapeflows").glob("*.json"):
         with open(filepath, "r", encoding="utf-8") as flowdef_json:
             flowdef = json.load(flowdef_json)
-            site = flowdef["site"]
-            type_ = flowdef["type"].split("_", 1)[0]
-            types = sites.get(site, [])
-            if type_ not in types:
-                types.append(type_)
-            sites[site] = types
+        site = flowdef["site"]
+        type_ = flowdef["type"].split("_", 1)[0]
+
+        # aggregate types
+        site_conf = sites.get(site, {})
+        types = site_conf.get("types", [])
+        if type_ not in types:
+            types.append(type_)
+        site_conf["types"] = types
+
+        # aggregate config
+        if "config" in flowdef:
+            config = site_conf.get("config", {})
+            config.update(flowdef["config"])
+            site_conf["config"] = config
+
+        sites[site] = site_conf
+
     return sites
 
 
