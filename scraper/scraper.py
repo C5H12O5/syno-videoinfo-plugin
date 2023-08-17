@@ -5,7 +5,7 @@ import logging
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from scraper.exceptions import ScrapeError
 from scraper.functions import findfunc
@@ -94,7 +94,8 @@ def _start(flow: "ScrapeFlow", limit: int):
 class ScrapeFlow:
     """A flow of steps to scrape video information."""
 
-    def __init__(self, site: str, steps: list, context: dict, priority: int):
+    def __init__(self, site: str, steps: list, context: dict,
+                 priority: Optional[int]):
         self.site = site
         self.steps = steps
         self.context = context
@@ -133,7 +134,10 @@ class ScrapeFlow:
             steps = list(flowdef["steps"])
             context = initialval.copy()
             context["site"] = site
-            priority = siteconf["priority"] if siteconf is not None else None
+            priority = None
+            if siteconf is not None:
+                priority = siteconf["priority"]
+                context.update(siteconf)
             yield ScrapeFlow(site, steps, context, priority)
 
     @staticmethod
