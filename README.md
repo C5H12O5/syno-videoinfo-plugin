@@ -13,12 +13,21 @@ other than the default ones.
 
 * Implemented in Python without any third-party dependencies.
 * Supports multiple sources, and can be easily extended to support more.
+* Has a simple configuration page where you can customize your plugin.
 
 ## Usage
 
-1. Download the latest release from [here](https://github.com/C5H12O5/syno-videoinfo-plugin/releases).
-2. Open your Video Station, go to "Settings" > "Video Info Plugin".
-3. Click "Add", select the downloaded file, and click "OK".
+Install the plugin:
+
+1. Download the latest release from [**here**](https://github.com/C5H12O5/syno-videoinfo-plugin/releases).
+2. Open your Video Station, go to ***Settings*** > ***Video Info Plugin***.
+3. Click ***Add***, select the downloaded file, and click ***OK***.
+
+Configure the plugin:
+
+1. Open your browser, go to `http://[NAS_IP]:5125` (replace `[NAS_IP]` with your NAS IP address).
+2. Change the configuration as you want, and click ***Save Button*** in the upper right corner.
+3. Go back to your Video Station, the configuration should be applied automatically.
 
 ## Requirements
 
@@ -39,7 +48,7 @@ other than the default ones.
 > * Example: Avatar (2009).avi
 >
 > TV Show:
-> * Naming format: TV_Show_Name.SXX.EYY.ext ("S" as a shorthand for "Season and "E" for "Episode")
+> * Naming format: TV_Show_Name.SXX.EYY.ext (***S*** as a shorthand for ***Season*** and ***E*** for ***Episode***)
 > * Example: Gossip Girl.S03.E04.avi
 
 ## Development
@@ -55,7 +64,7 @@ $ git clone https://github.com/C5H12O5/syno-videoinfo-plugin
 2. Modify the code as you want, and test it like this:
 
 ```sh
-$ python main.py --type movie --input "{\"title\":\"{movie title}\"}" --limit 1 --loglevel debug
+$ python main.py --type movie --input "{\"title\":\"{movie_title}\"}" --limit 1 --loglevel debug
 ```
 
 3. Package the plugin using the following command:
