@@ -37,7 +37,7 @@ Configure the plugin:
 
 ## References
 
-* [The Video Station Metadata Introduction](https://kb.synology.com/en-id/DSM/help/VideoStation/metadata?version=7)
+* [The Video Station Metadata](https://kb.synology.com/en-id/DSM/help/VideoStation/metadata?version=7)
 * [The Video Station API documentation](https://download.synology.com/download/Document/Software/DeveloperGuide/Package/VideoStation/All/enu/Synology_Video_Station_API_enu.pdf)
 
 > Tips for naming video files:
