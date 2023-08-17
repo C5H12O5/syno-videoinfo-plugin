@@ -76,7 +76,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
         elif self.path.endswith("/exit"):
             self.send_response(200)
-            self.wfile.write(b"Closing server...")
+            self.end_headers()
             self.server.server_close()
             sys.exit()
 
