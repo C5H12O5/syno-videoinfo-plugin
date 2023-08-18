@@ -54,13 +54,16 @@
                       "backdrop": "['xp_texts', './movie/img']"
                     }
                   }
-                }
+                },
+                "publish_date": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                "available_date": "{$parent[available]}"
               }
             }
           },
           {
             "retval": {
-              "source": "tvshow"
+              "source": "tvshow",
+              "compare": "['publish_date', '>=', 'available_date']"
             }
           }
         ]
