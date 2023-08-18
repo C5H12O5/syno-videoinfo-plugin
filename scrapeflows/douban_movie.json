@@ -60,7 +60,9 @@
                       "backdrop": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']"
                     }
                   }
-                }
+                },
+                "publish_date": "['xp_text', './datePublished']",
+                "available_date": "{$parent[available]}"
               }
             }
           },
@@ -76,7 +78,8 @@
           },
           {
             "retval": {
-              "source": "movie"
+              "source": "movie",
+              "compare": "['publish_date', '>=', 'available_date']"
             }
           }
         ]

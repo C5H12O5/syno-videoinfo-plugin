@@ -48,7 +48,7 @@ def scrape(plugin_id: str) -> str:
         "title": jsoninput["title"],
         "season": jsoninput.get("season", 0),
         "episode": jsoninput.get("episode", 1),
-        "year": jsoninput.get("original_available", None),
+        "available": jsoninput.get("original_available", None),
         "lang": args.lang,
         "limit": maxlimit,
         "allowguess": args.allowguess,
