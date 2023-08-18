@@ -59,7 +59,9 @@
             }
           },
           {
-            "retval": "tvshow"
+            "retval": {
+              "source": "tvshow"
+            }
           }
         ]
       }

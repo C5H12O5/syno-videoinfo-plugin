@@ -68,7 +68,9 @@
             }
           },
           {
-            "retval": "movie"
+            "retval": {
+              "source": "movie"
+            }
           }
         ]
       }

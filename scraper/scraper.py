@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from scraper.exceptions import ScrapeError
+from scraper.exceptions import ScrapeError, StopSignal
 from scraper.functions import findfunc
 
 _logger = logging.getLogger(__name__)
@@ -105,9 +105,12 @@ class ScrapeFlow:
         """Start the scrape flow and return a generator."""
         for funcname, rawargs in [s.popitem() for s in self.steps]:
             # execute the function with context
-            iterable = findfunc(funcname)(rawargs, self.context)
-            if iterable is not None:
-                yield from iterable
+            try:
+                iterable = findfunc(funcname)(rawargs, self.context)
+                if iterable is not None:
+                    yield from iterable
+            except StopSignal:
+                break
 
     @staticmethod
     def load(path: Path, videotype: str, initialval: dict):

@@ -14,3 +14,7 @@ class RequestSendError(ScrapeError):
 class ResultParseError(ScrapeError):
     def __init__(self):
         super().__init__(1004)
+
+
+class StopSignal(Exception):
+    pass
