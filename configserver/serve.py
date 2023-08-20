@@ -79,7 +79,7 @@ def load_sites():
 
         sites[site] = site_conf
 
-    return sites
+    return dict(sorted(sites.items(), key=lambda x: x[0]))
 
 
 # initialize the index page
