@@ -1,6 +1,7 @@
 {
   "type": "tvshow",
   "site": "maoyan.com",
+  "lang": ["zh-CN"],
   "steps": [
     {
       "http": {
