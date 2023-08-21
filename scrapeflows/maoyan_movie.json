@@ -19,7 +19,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "['re_matches', '\\\"id\\\":(\\d+),.*?\\\"movieType\\\":0']"
+          "ids": "['re_matches', '\"id\":(\\d+),.*?\"movieType\":0']"
         }
       }
     },
