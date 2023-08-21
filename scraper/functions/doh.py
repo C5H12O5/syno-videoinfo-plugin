@@ -5,31 +5,37 @@ import socket
 import urllib
 import urllib.request
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from scraper.exceptions import RequestSendError
 from scraper.functions import Args, Func
 
 _logger = logging.getLogger(__name__)
 _registered_hosts = set()
+_doh_cache: Dict[str, str] = {}
 _doh_resolvers = [
     # https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https
     "1.1.1.1/dns-query",
-
     # https://developers.google.com/speed/public-dns/docs/doh
-    "8.8.8.8/resolve"
+    "8.8.8.8/resolve",
 ]
 
 
 def _patched_getaddrinfo(host, *args, **kwargs):
     """Patched version of socket.getaddrinfo."""
     if host in _registered_hosts:
-        for resolver in _doh_resolvers:
-            ip = _doh_query(resolver, host)
-            if ip is not None:
-                _logger.info("Resolved %s to %s", host, ip)
-                host = ip
-                break
+        if host in _doh_cache:
+            ip = _doh_cache[host]
+            _logger.info("Resolved %s to %s (cached)", host, ip)
+            host = ip
+        else:
+            for resolver in _doh_resolvers:
+                ip = _doh_query(resolver, host)
+                if ip is not None:
+                    _logger.info("Resolved %s to %s", host, ip)
+                    _doh_cache[host] = ip
+                    host = ip
+                    break
     return _orig_getaddrinfo(host, *args, **kwargs)
 
 
