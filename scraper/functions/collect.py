@@ -138,7 +138,7 @@ def _regex_match(strategy: str, expr: str, source: str):
         matches = pattern.search(source)
         return matches.group(1) if matches else None
     elif strategy == "matches":
-        return pattern.findall(source)
+        return list(dict.fromkeys(pattern.findall(source)))
     return None
 
 

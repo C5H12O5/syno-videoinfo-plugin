@@ -53,6 +53,7 @@ def scrape(plugin_id: str) -> str:
         "season": jsoninput.get("season", 0),
         "episode": jsoninput.get("episode", 1),
         "available": jsoninput.get("original_available", None),
+        "year": jsoninput.get("original_available", "")[:4],
         "lang": language,
         "limit": maxlimit
     }
