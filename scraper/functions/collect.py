@@ -145,7 +145,9 @@ def _regex_match(strategy: str, expr: str, source: str):
 def _modify(result: Any, strategy: str, args: list):
     """Modify the result using the given strategy and arguments."""
     args_len = len(args)
-    if strategy == "split" and args_len == 1:
+    if strategy == "int":
+        result = int(result)
+    elif strategy == "split" and args_len == 1:
         result = result.split(args[0])
     elif strategy == "prefix" and args_len == 1:
         result = args[0] + result

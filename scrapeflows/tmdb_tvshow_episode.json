@@ -94,8 +94,8 @@
               "into": {
                 "episode": {
                   "tagline": "['xp_text', './name']",
-                  "season": "['xp_text', './season_number']",
-                  "episode": "['xp_text', './episode_number']",
+                  "season": "['xp_text', './season_number', 'int']",
+                  "episode": "['xp_text', './episode_number', 'int']",
                   "original_available": "['xp_text', './air_date']",
                   "summary": "['xp_text', './overview']",
                   "actor": "['xp_texts', './credits/cast//name']",
