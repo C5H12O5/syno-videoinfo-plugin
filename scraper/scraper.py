@@ -5,9 +5,10 @@ import logging
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from scraper.exceptions import ScrapeError
+from scraper.enums import lang_type, video_type
+from scraper.exceptions import ScrapeError, StopSignal
 from scraper.functions import findfunc
 
 _logger = logging.getLogger(__name__)
@@ -26,21 +27,24 @@ def scrape(plugin_id: str) -> str:
     """Scrape video information from given arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
-    parser.add_argument("--type", type=str, required=True)
-    parser.add_argument("--lang", type=str, required=False)
+    parser.add_argument("--type", type=video_type, required=True)
+    parser.add_argument("--lang", type=lang_type, required=False)
     parser.add_argument("--limit", type=int, default=_maxlimit)
     parser.add_argument("--allowguess", action="store_true", default=False)
     parser.add_argument("--loglevel", type=str, default="critical")
+
     args = parser.parse_known_args()[0]
+    videotype = args.type.value
+    language = args.lang.value if args.lang is not None else None
     maxlimit = min(args.limit, _maxlimit)
+    loglevel = args.loglevel.upper()
 
     # set basic logging configuration
-    loglevel = getattr(logging, args.loglevel.upper())
     logformat = (
         "%(asctime)s %(threadName)s %(levelname)s "
         "%(filename)s:%(lineno)d - %(message)s"
     )
-    logging.basicConfig(level=loglevel, format=logformat)
+    logging.basicConfig(level=getattr(logging, loglevel), format=logformat)
 
     # parse --input argument as JSON
     jsoninput = json.loads(args.input)
@@ -48,16 +52,16 @@ def scrape(plugin_id: str) -> str:
         "title": jsoninput["title"],
         "season": jsoninput.get("season", 0),
         "episode": jsoninput.get("episode", 1),
-        "year": jsoninput.get("original_available", None),
-        "lang": args.lang,
-        "limit": maxlimit,
-        "allowguess": args.allowguess,
+        "available": jsoninput.get("original_available", None),
+        "year": jsoninput.get("original_available", "")[:4],
+        "lang": language,
+        "limit": maxlimit
     }
 
     # load and execute scrape flows using multithreading
     start = time.time()
     taskqueue: Dict[int, List[threading.Thread]] = {}
-    for flow in ScrapeFlow.load(_flow_path, args.type, initialval):
+    for flow in ScrapeFlow.load(_flow_path, videotype, language, initialval):
         task = threading.Thread(target=_start, args=(flow, maxlimit))
         tasks = taskqueue.get(flow.priority, [])
         tasks.append(task)
@@ -94,7 +98,8 @@ def _start(flow: "ScrapeFlow", limit: int):
 class ScrapeFlow:
     """A flow of steps to scrape video information."""
 
-    def __init__(self, site: str, steps: list, context: dict, priority: int):
+    def __init__(self, site: str, steps: list, context: dict,
+                 priority: Optional[int]):
         self.site = site
         self.steps = steps
         self.context = context
@@ -104,12 +109,15 @@ class ScrapeFlow:
         """Start the scrape flow and return a generator."""
         for funcname, rawargs in [s.popitem() for s in self.steps]:
             # execute the function with context
-            iterable = findfunc(funcname)(rawargs, self.context)
-            if iterable is not None:
-                yield from iterable
+            try:
+                iterable = findfunc(funcname)(rawargs, self.context)
+                if iterable is not None:
+                    yield from iterable
+            except StopSignal:
+                break
 
     @staticmethod
-    def load(path: Path, videotype: str, initialval: dict):
+    def load(path: Path, videotype: str, language: str, initialval: dict):
         """Load scrape flows from given path."""
 
         flowconf = None
@@ -126,19 +134,27 @@ class ScrapeFlow:
                 siteconf = flowconf[site]
 
             # filter out flows that do not match the video type
-            if not ScrapeFlow.valid(flowdef, videotype, siteconf):
+            if not ScrapeFlow.valid(flowdef, siteconf, videotype, language):
                 continue
 
             # generate a flow instance from the definition
             steps = list(flowdef["steps"])
             context = initialval.copy()
             context["site"] = site
-            priority = siteconf["priority"] if siteconf is not None else None
+            priority = None
+            if siteconf is not None:
+                priority = siteconf["priority"]
+                context.update(siteconf)
             yield ScrapeFlow(site, steps, context, priority)
 
     @staticmethod
-    def valid(flowdef: Any, videotype: str, siteconf: Any):
+    def valid(flowdef: Any, siteconf: Any, videotype: str, language: str):
         """Check if the flow definition is valid."""
+
+        if language is not None and "lang" in flowdef:
+            if language not in flowdef["lang"]:
+                return False
+
         if flowdef["type"] != videotype:
             return False
 

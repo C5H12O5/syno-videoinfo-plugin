@@ -1,0 +1,135 @@
+{
+  "type": "tvshow_episode",
+  "site": "themoviedb.org",
+  "config": {
+    "apikey": {
+      "icon": "key",
+      "name": "API Key"
+    }
+  },
+  "steps": [
+    {
+      "retval": {
+        "ifempty": "apikey"
+      }
+    },
+    {
+      "doh": {
+        "host": "api.themoviedb.org"
+      }
+    },
+    {
+      "http": {
+        "url": "https://api.themoviedb.org/3/search/tv?api_key={apikey}&language={lang}&query={title}&year={year}&page=1",
+        "method": "GET",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['xp_texts', './results//id']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "https://api.themoviedb.org/3/tv/{id}?api_key={$parent[apikey]}&language={$parent[lang]}&append_to_response=content_ratings",
+              "method": "GET",
+              "headers": {
+                "Accept": "application/json"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "episode": {
+                  "title": "['xp_text', './name']",
+                  "certificate": "['re_match', '\"content_ratings\":.*?\"US\".*?\"rating\":\"([^\"]*?)\"']",
+                  "genre": "['xp_texts', './genres//name']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "tvshow": {
+                        "title": "['xp_text', './name']",
+                        "original_available": "['xp_text', './first_air_date']",
+                        "summary": "['xp_text', './overview']",
+                        "extra": {
+                          "[plugin_id]": {
+                            "poster": ["['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"],
+                            "backdrop": ["['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "http": {
+              "url": "https://api.themoviedb.org/3/tv/{id}/season/{$parent[season]}/episode/{$parent[episode]}?api_key={$parent[apikey]}&language={$parent[lang]}&append_to_response=credits",
+              "method": "GET",
+              "headers": {
+                "Accept": "application/json"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "episode": {
+                  "tagline": "['xp_text', './name']",
+                  "season": "['xp_text', './season_number', 'int']",
+                  "episode": "['xp_text', './episode_number', 'int']",
+                  "original_available": "['xp_text', './air_date']",
+                  "summary": "['xp_text', './overview']",
+                  "actor": "['xp_texts', './credits/cast//name']",
+                  "writer": "['re_matches', '\"department\":\"Writing\"[^{{}}]*?\"name\":\"([^\"]*?)\"']",
+                  "director": "['re_matches', '\"department\":\"Directing\"[^{{}}]*?\"name\":\"([^\"]*?)\"']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "rating": {
+                        "[plugin_id]": "['xp_text', './vote_average', 're_sub', '(\\d+\\.\\d)\\d*', '\\\\1']"
+                      },
+                      "poster": ["['xp_text', './still_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "episode": {
+                  "actor": "['xp_texts', './credits/guest_stars//name']"
+                }
+              }
+            }
+          },
+          {
+            "retval": {
+              "source": "episode"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

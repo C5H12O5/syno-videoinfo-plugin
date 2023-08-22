@@ -1,6 +1,7 @@
 {
   "type": "movie",
   "site": "maoyan.com",
+  "lang": ["zh-CN"],
   "steps": [
     {
       "http": {
@@ -18,7 +19,7 @@
       "collect": {
         "source": "metadata",
         "into": {
-          "ids": "['re_matches', '\\\"id\\\":(\\d+),.*?\\\"movieType\\\":0']"
+          "ids": "['re_matches', '\"id\":(\\d+),.*?\"movieType\":0']"
         }
       }
     },
@@ -63,12 +64,17 @@
                       "backdrop": "['xp_texts', './movie/img']"
                     }
                   }
-                }
+                },
+                "publish_date": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                "available_date": "{$parent[available]}"
               }
             }
           },
           {
-            "retval": "movie"
+            "retval": {
+              "source": "movie",
+              "compare": "['publish_date', '>=', 'available_date']"
+            }
           }
         ]
       }

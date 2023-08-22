@@ -1,0 +1,90 @@
+{
+  "type": "movie",
+  "site": "themoviedb.org",
+  "config": {
+    "apikey": {
+      "icon": "key",
+      "name": "API Key"
+    }
+  },
+  "steps": [
+    {
+      "retval": {
+        "ifempty": "apikey"
+      }
+    },
+    {
+      "doh": {
+        "host": "api.themoviedb.org"
+      }
+    },
+    {
+      "http": {
+        "url": "https://api.themoviedb.org/3/search/movie?api_key={apikey}&language={lang}&query={title}&year={year}&page=1",
+        "method": "GET",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['xp_texts', './results//id']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "https://api.themoviedb.org/3/movie/{id}?api_key={$parent[apikey]}&language={$parent[lang]}&append_to_response=credits,release_dates",
+              "method": "GET",
+              "headers": {
+                "Accept": "application/json"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "movie": {
+                  "title": "['xp_text', './title']",
+                  "tagline": "['xp_text', './tagline']",
+                  "original_available": "['xp_text', './release_date']",
+                  "summary": "['xp_text', './overview']",
+                  "certificate": "['re_match', '\"release_dates\":.*?\"US\".*?\"certification\":\"([^\"]*?)\"']",
+                  "genre": "['xp_texts', './genres//name']",
+                  "actor": "['xp_texts', './credits/cast//name']",
+                  "writer": "['re_matches', '\"name\":\"([^\"]*?)\"[^{{}}]*?\"department\":\"Writing\"']",
+                  "director": "['re_matches', '\"name\":\"([^\"]*?)\"[^{{}}]*?\"department\":\"Directing\"']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "rating": {
+                        "[plugin_id]": "['xp_text', './vote_average', 're_sub', '(\\d+\\.\\d)\\d*', '\\\\1']"
+                      },
+                      "poster": ["['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"],
+                      "backdrop": ["['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "retval": {
+              "source": "movie"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

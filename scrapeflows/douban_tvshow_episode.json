@@ -1,6 +1,7 @@
 {
   "type": "tvshow_episode",
   "site": "douban.com",
+  "lang": ["zh-CN"],
   "steps": [
     {
       "http": {
@@ -69,7 +70,9 @@
                       "poster": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']"
                     }
                   }
-                }
+                },
+                "publish_date": "['xp_text', './datePublished']",
+                "available_date": "{$parent[available]}"
               }
             }
           },
@@ -102,7 +105,10 @@
             }
           },
           {
-            "retval": "episode"
+            "retval": {
+              "source": "episode",
+              "compare": "['publish_date', '>=', 'available_date']"
+            }
           }
         ]
       }

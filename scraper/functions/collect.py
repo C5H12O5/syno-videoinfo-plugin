@@ -138,19 +138,24 @@ def _regex_match(strategy: str, expr: str, source: str):
         matches = pattern.search(source)
         return matches.group(1) if matches else None
     elif strategy == "matches":
-        return pattern.findall(source)
+        return list(dict.fromkeys(pattern.findall(source)))
     return None
 
 
 def _modify(result: Any, strategy: str, args: list):
     """Modify the result using the given strategy and arguments."""
-    if strategy == "split" and len(args) == 1:
-        sep = args[0]
-        result = result.split(sep) if isinstance(result, str) else result
-    elif strategy == "strftime" and len(args) == 1:
-        pattern = args[0]
-        result = strftime(result, pattern)
-    elif strategy == "re_sub" and len(args) == 2:
+    args_len = len(args)
+    if strategy == "int":
+        result = int(result)
+    elif strategy == "split" and args_len == 1:
+        result = result.split(args[0])
+    elif strategy == "prefix" and args_len == 1:
+        result = args[0] + result
+    elif strategy == "suffix" and args_len == 1:
+        result = result + args[0]
+    elif strategy == "strftime" and args_len == 1:
+        result = strftime(result, args[0])
+    elif strategy == "re_sub" and args_len == 2:
         pattern, repl = args
         result = re_sub(result, pattern, repl)
     return result

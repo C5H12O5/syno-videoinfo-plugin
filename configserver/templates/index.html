@@ -87,6 +87,10 @@
                         types: selectInst.getSelectedValues(),
                         priority: parseInt(priorityElem.value)
                     }
+                    var configs = document.getElementsByClassName(form.id + '-config');
+                    [...configs].forEach(config => {
+                        data[form.id][config.id.substring(form.id.length + 1)] = config.value;
+                    });
                 });
 
                 fetch('/save', {
