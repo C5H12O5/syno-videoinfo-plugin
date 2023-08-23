@@ -20,16 +20,13 @@ info_tmpl = """
   "language": ["chs"],
   "test_example": {
     "movie": {
-      "title": "两杆大烟枪",
-      "original_available": "1998-08-28"
+      "title": "--install"
     },
     "tvshow": {
-      "title": "怪奇物语 第一季",
-      "original_available": "2016-07-15"
+      "title": "--install"
     },
     "tvshow_episode": {
-      "title": "怪奇物语 第一季",
-      "original_available": "2016-07-15",
+      "title": "--install",
       "season": 1,
       "episode": 1
     }

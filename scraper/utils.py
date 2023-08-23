@@ -9,12 +9,14 @@ from xml.etree import ElementTree
 from scraper.exceptions import ResultParseError
 
 
-def strftime(timestamp: Union[str, int, float], pattern: str) -> str:
+def strftime(
+    timestamp: Union[str, int, float], pattern: str, millisecs: bool = False
+) -> str:
     """Format a timestamp with the given pattern."""
     if isinstance(timestamp, str):
         timestamp = float(timestamp)
 
-    if timestamp >= 1000000000000:
+    if millisecs:
         timestamp /= 1000
 
     return time.strftime(pattern, time.localtime(timestamp))

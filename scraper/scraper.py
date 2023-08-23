@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from scraper.enums import lang_type, video_type
 from scraper.exceptions import ScrapeError, StopSignal
+from scraper.fake import fake_result
 from scraper.functions import findfunc
 
 _logger = logging.getLogger(__name__)
@@ -48,6 +49,8 @@ def scrape(plugin_id: str) -> str:
 
     # parse --input argument as JSON
     jsoninput = json.loads(args.input)
+    if jsoninput["title"] == "--install":
+        return fake_result(plugin_id, videotype)
     initialval = {
         "title": jsoninput["title"],
         "season": jsoninput.get("season", 0),

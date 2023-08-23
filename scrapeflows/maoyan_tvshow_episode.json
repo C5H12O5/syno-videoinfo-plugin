@@ -48,18 +48,18 @@
                 "episode": {
                   "title": "['xp_text', './movie/nm']",
                   "tagline": "",
-                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d', 'True']",
                   "summary": "['xp_text', './movie/dra']",
                   "certificate": "",
                   "genre": "['xp_text', './movie/cat', 'split', ',']",
                   "actor": "['xp_text', './movie/star', 'split', ',']",
-                  "writer": ["unknown"],
+                  "writer": [],
                   "director": "['xp_text', './movie/dir', 'split', ',']",
                   "extra": {
                     "[plugin_id]": {
                       "tvshow": {
                         "title": "['xp_text', './movie/nm']",
-                        "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                        "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d', 'True']",
                         "summary": "['xp_text', './movie/dra']",
                         "extra": {
                           "[plugin_id]": {
