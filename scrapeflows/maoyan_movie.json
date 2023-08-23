@@ -48,12 +48,12 @@
                 "movie": {
                   "title": "['xp_text', './movie/nm']",
                   "tagline": "['xp_text', './movie/enm']",
-                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d', 'True']",
                   "summary": "['xp_text', './movie/dra']",
                   "certificate": "",
                   "genre": "['xp_text', './movie/cat', 'split', ',']",
                   "actor": "['xp_text', './movie/star', 'split', ',']",
-                  "writer": ["unknown"],
+                  "writer": [],
                   "director": "['xp_text', './movie/dir', 'split', ',']",
                   "extra": {
                     "[plugin_id]": {

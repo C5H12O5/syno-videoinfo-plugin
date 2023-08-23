@@ -47,7 +47,7 @@
               "into": {
                 "tvshow": {
                   "title": "['xp_text', './movie/nm']",
-                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                  "original_available": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d', 'True']",
                   "summary": "['xp_text', './movie/dra']",
                   "extra": {
                     "[plugin_id]": {

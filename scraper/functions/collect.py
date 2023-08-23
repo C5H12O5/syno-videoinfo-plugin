@@ -153,9 +153,11 @@ def _modify(result: Any, strategy: str, args: list):
         result = args[0] + result
     elif strategy == "suffix" and args_len == 1:
         result = result + args[0]
-    elif strategy == "strftime" and args_len == 1:
-        result = strftime(result, args[0])
     elif strategy == "re_sub" and args_len == 2:
         pattern, repl = args
         result = re_sub(result, pattern, repl)
+    elif strategy == "strftime":
+        pattern = args[0]
+        millisecs = args[1] if args_len == 2 else False
+        result = strftime(result, pattern, millisecs)
     return result
