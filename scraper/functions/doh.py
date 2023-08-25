@@ -20,42 +20,59 @@ _timeout = 5
 _registered_hosts = set()
 _doh_cache: Dict[str, str] = {}
 _doh_resolvers = [
-    # https://support.opendns.com/hc/en-us
-    # https://support.quad9.net/hc/en-us
     # https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https
     "1.1.1.1/dns-query",
+    "1.0.0.1/dns-query",
+
     # https://developers.google.com/speed/public-dns/docs/doh
     "8.8.8.8/dns-query",
+    "8.8.4.4/dns-query",
+
+    # https://support.quad9.net/hc/en-us
+    "9.9.9.9/dns-query",
+    "149.112.112.112/dns-query",
+
+    # https://support.opendns.com/hc/en-us
+    "208.67.222.222/dns-query",
+    "208.67.220.220/dns-query",
+
+    # https://adguard-dns.io/public-dns.html
+    "94.140.14.14/dns-query",
+    "94.140.15.15/dns-query",
 ]
 
 
 def _patched_getaddrinfo(host, *args, **kwargs):
     """Patched version of socket.getaddrinfo."""
-    if host in _registered_hosts:
-        if host in _doh_cache:
-            ip = _doh_cache[host]
-            _logger.info("Resolved %s to %s (cached)", host, ip)
-            host = ip
-        else:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                futures = []
-                for resolver in _doh_resolvers:
-                    futures.append(executor.submit(_doh_query, resolver, host))
+    if host not in _registered_hosts:
+        return _orig_getaddrinfo(host, *args, **kwargs)
 
-                done, not_done = concurrent.futures.wait(
-                    futures, return_when=concurrent.futures.FIRST_COMPLETED
-                )
+    # check if the host is already resolved
+    if host in _doh_cache:
+        ip = _doh_cache[host]
+        _logger.info("Resolved %s to %s (cached)", host, ip)
+        return _orig_getaddrinfo(ip, *args, **kwargs)
 
-                for future in done:
-                    ip = future.result()
-                    if ip is not None:
-                        _logger.info("Resolved %s to %s", host, ip)
-                        _doh_cache[host] = ip
-                        host = ip
-                        break
+    # resolve the host using DoH
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for resolver in _doh_resolvers:
+            futures.append(executor.submit(_doh_query, resolver, host))
 
-                for future in not_done:
-                    future.cancel()
+        done, not_done = concurrent.futures.wait(
+            futures, return_when=concurrent.futures.FIRST_COMPLETED
+        )
+
+        for future in done:
+            ip = future.result()
+            if ip is not None:
+                _logger.info("Resolved %s to %s", host, ip)
+                _doh_cache[host] = ip
+                host = ip
+                break
+
+        for future in not_done:
+            future.cancel()
 
     return _orig_getaddrinfo(host, *args, **kwargs)
 
