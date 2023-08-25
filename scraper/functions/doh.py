@@ -1,9 +1,12 @@
 """The implementation of the doh function."""
 import base64
+import concurrent
+import concurrent.futures
 import json
 import logging
 import socket
 import struct
+import time
 import urllib
 import urllib.request
 from dataclasses import dataclass
@@ -13,6 +16,7 @@ from scraper.exceptions import RequestSendError
 from scraper.functions import Args, Func
 
 _logger = logging.getLogger(__name__)
+_timeout = 5
 _registered_hosts = set()
 _doh_cache: Dict[str, str] = {}
 _doh_resolvers = [
@@ -33,16 +37,26 @@ def _patched_getaddrinfo(host, *args, **kwargs):
             _logger.info("Resolved %s to %s (cached)", host, ip)
             host = ip
         else:
-            for resolver in _doh_resolvers:
-                try:
-                    ip = _doh_query(resolver, host)
-                except RequestSendError:
-                    continue
-                if ip is not None:
-                    _logger.info("Resolved %s to %s", host, ip)
-                    _doh_cache[host] = ip
-                    host = ip
-                    break
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = []
+                for resolver in _doh_resolvers:
+                    futures.append(executor.submit(_doh_query, resolver, host))
+
+                done, not_done = concurrent.futures.wait(
+                    futures, return_when=concurrent.futures.FIRST_COMPLETED
+                )
+
+                for future in done:
+                    ip = future.result()
+                    if ip is not None:
+                        _logger.info("Resolved %s to %s", host, ip)
+                        _doh_cache[host] = ip
+                        host = ip
+                        break
+
+                for future in not_done:
+                    future.cancel()
+
     return _orig_getaddrinfo(host, *args, **kwargs)
 
 
@@ -88,10 +102,10 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
         _logger.info("DoH request: %s", url)
 
         request = urllib.request.Request(url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=5) as response:
+        with urllib.request.urlopen(request, timeout=_timeout) as response:
             _logger.info("DoH response: %s", response.status)
             if response.status != 200:
-                return None
+                raise RequestSendError
             resp_body = response.read()
 
         # parse DNS response message (RFC 1035)
@@ -103,6 +117,7 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
         return socket.inet_ntoa(resp_body[first_rdata_start:first_rdata_end])
     except Exception as e:
         _logger.error("DoH request error: %s", e)
+        time.sleep(_timeout)
         raise RequestSendError from e
 
 
@@ -111,22 +126,19 @@ def _doh_query_json(resolver: str, host: str) -> Optional[str]:
     url = f"https://{resolver}?name={host}&type=A"
     headers = {"Accept": "application/dns-json"}
     _logger.info("DoH request: %s", url)
-
     try:
         request = urllib.request.Request(url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=5) as response:
+        with urllib.request.urlopen(request, timeout=_timeout) as response:
             _logger.info("DoH response: %s", response.status)
-
-            if response.status == 200:
-                response_body = response.read().decode("utf-8")
-                _logger.debug("<==  body: %s", response_body)
-
-                answer = json.loads(response_body)["Answer"]
-                return answer[0]["data"]
-            else:
-                return None
+            if response.status != 200:
+                raise RequestSendError
+            response_body = response.read().decode("utf-8")
+            _logger.debug("<==  body: %s", response_body)
+            answer = json.loads(response_body)["Answer"]
+            return answer[0]["data"]
     except Exception as e:
         _logger.error("DoH request error: %s", e)
+        time.sleep(_timeout)
         raise RequestSendError from e
 
 
