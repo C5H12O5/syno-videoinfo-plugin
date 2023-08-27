@@ -57,7 +57,7 @@
                         "[plugin_id]": "['xp_text', './/ratingValue']"
                       },
                       "poster": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']",
-                      "backdrop": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']"
+                      "backdrop": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/l/\\\\2']"
                     }
                   }
                 },
