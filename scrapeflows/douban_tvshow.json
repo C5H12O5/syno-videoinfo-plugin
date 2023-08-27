@@ -1,7 +1,6 @@
 {
   "type": "tvshow",
   "site": "douban.com",
-  "lang": ["zh-CN"],
   "steps": [
     {
       "http": {
