@@ -2,6 +2,7 @@
 
 BASEDIR=$(dirname $0)
 ARGV=""
+PORT=5125
 
 escape()
 {
@@ -16,8 +17,7 @@ while [ $i -le $# ]; do
 	i=`expr $i + 1`
 done
 
-port=5125
-if ! netstat -tuln | grep ":$port" >/dev/null; then
+if ! netstat -tuln | grep ":$PORT" >/dev/null; then
 	nohup /usr/bin/env python3 "$BASEDIR"/configserver/serve.py > /dev/null 2>&1 &
 fi
 
