@@ -1,0 +1,88 @@
+{
+  "type": "movie",
+  "site": "mtime.com",
+  "steps": [
+    {
+      "http": {
+        "url": "http://front-gateway.mtime.com/mtime-search/search/unionSearch2",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Host": "front-gateway.mtime.com",
+          "Origin": "http://film.mtime.com",
+          "Referer": "http://film.mtime.com/",
+          "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+        },
+        "body": {
+          "keyword": "{title}",
+          "searchType": 0,
+          "pageIndex": 1,
+          "pageSize": "{limit}",
+          "year": "{year}"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['re_matches', '\"movieId\":(\\d+),[^{{}}]*?\"movieContentType\":\"电影\"']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "http://front-gateway.mtime.com/library/movie/detail.api?movieId={id}",
+              "method": "GET",
+              "headers": {
+                "Host": "front-gateway.mtime.com",
+                "Origin": "http://movie.mtime.com",
+                "Referer": "http://movie.mtime.com/",
+                "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "movie": {
+                  "title": "['xp_text', './data/basic/name']",
+                  "tagline": "['xp_text', './data/basic/nameEn']",
+                  "original_available": "['xp_text', './data/basic/releaseDate', 'reformat', '%Y%m%d', '%Y-%m-%d']",
+                  "summary": "['xp_text', './data/basic/story']",
+                  "certificate": "",
+                  "genre": "['xp_texts', './data/basic/movieGenres//name']",
+                  "actor": "['xp_texts', './data/basic/actors//name']",
+                  "writer": "['xp_texts', './data/basic/writers//name']",
+                  "director": "['xp_texts', './data/basic/directors//name']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "rating": {
+                        "[plugin_id]": "['xp_text', './data/basic/overallRating']"
+                      },
+                      "poster": "['xp_texts', './data/basic/img']",
+                      "backdrop": "['xp_texts', './data/basic/bigImage']"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "retval": {
+              "source": "movie"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

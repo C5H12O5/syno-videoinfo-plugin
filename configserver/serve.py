@@ -6,9 +6,9 @@ import sys
 from http.server import HTTPServer
 from pathlib import Path
 
+_basedir = Path(__file__).resolve().parent
 _host = "0.0.0.0"
 _port = 5125
-_basedir = Path(__file__).resolve().parent
 
 # initialize the templates
 with open(_basedir / "templates/config.html", "r", encoding="utf-8") as html:
@@ -40,10 +40,11 @@ def render_index(saved=None):
             source["priority"] = saved_conf["priority"]
         source_html += _source_tmpl.substitute(source)
 
-    return _index_tmpl.substitute(sources=source_html)
+    return _index_tmpl.substitute(sources=source_html, version=plugin_version())
 
 
 def render_config(site, site_conf, saved_conf):
+    """Render the configuration for a site."""
     config_html = ""
     config = site_conf.get("config")
     if config is not None:
@@ -80,6 +81,16 @@ def load_sites():
         sites[site] = site_conf
 
     return dict(sorted(sites.items(), key=lambda x: x[0]))
+
+
+def plugin_version():
+    """Get the plugin version from the directory name."""
+    dir_name = _basedir.parent.name
+    if "-" in dir_name:
+        version = dir_name.split("-")[-1]
+        if version != "plugin":
+            return f"v{version}"
+    return ""
 
 
 # initialize the index page

@@ -2,6 +2,7 @@
 import ast
 import logging
 import re
+import time
 from dataclasses import dataclass
 from typing import Any
 from xml.etree import ElementTree
@@ -91,7 +92,7 @@ def _render_str(tmpl: str, source, etree):
         result = source.get(expr)
 
     # modify result if needed
-    if result is not None and len(modification) > 0:
+    if result is not None and result != "" and len(modification) > 0:
         modifier, *args = modification
         result = _modify(result, modifier, args)
     return strip(result)
@@ -156,6 +157,9 @@ def _modify(result: Any, strategy: str, args: list):
     elif strategy == "re_sub" and args_len == 2:
         pattern, repl = args
         result = re_sub(result, pattern, repl)
+    elif strategy == "reformat" and args_len == 2:
+        orig_pattern, new_pattern = args
+        result = time.strftime(new_pattern, time.strptime(result, orig_pattern))
     elif strategy == "strftime":
         pattern = args[0]
         millisecs = args[1] if args_len == 2 else False
