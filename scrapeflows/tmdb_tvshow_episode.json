@@ -106,13 +106,11 @@
                   "director": "['re_matches', '\"department\":\"Directing\"[^{{}}]*?\"name\":\"([^\"]*?)\"']",
                   "extra": {
                     "[plugin_id]": {
-                      "rating": {
-                        "[plugin_id]": "['xp_text', './vote_average', 're_sub', '(\\d+\\.\\d)\\d*', '\\\\1']"
-                      },
                       "poster": ["['xp_text', './still_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"]
                     }
                   }
-                }
+                },
+                "rating": "['xp_text', './vote_average', 're_sub', '(\\d+\\.\\d)\\d*', '\\\\1']"
               }
             }
           },
@@ -122,6 +120,22 @@
               "into": {
                 "episode": {
                   "actor": "['xp_texts', './credits/guest_stars//name']"
+                }
+              }
+            }
+          },
+          {
+            "collect": {
+              "source": "rating",
+              "into": {
+                "episode": {
+                  "extra": {
+                    "[plugin_id]": {
+                      "rating": {
+                        "[plugin_id]": "['re_match', '(.*)', 'float']"
+                      }
+                    }
+                  }
                 }
               }
             }

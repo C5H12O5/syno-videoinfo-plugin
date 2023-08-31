@@ -66,7 +66,7 @@
                   "extra": {
                     "[plugin_id]": {
                       "rating": {
-                        "[plugin_id]": "['xp_text', './data/basic/overallRating']"
+                        "[plugin_id]": "['xp_text', './data/basic/overallRating', 'float']"
                       },
                       "poster": "['xp_texts', './data/basic/img']",
                       "backdrop": "['xp_texts', './data/basic/bigImage']"

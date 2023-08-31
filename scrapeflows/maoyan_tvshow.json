@@ -55,7 +55,7 @@
                     }
                   }
                 },
-                "publish_date": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                "publish_date": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d', 'True']",
                 "available_date": "{$parent[available]}"
               }
             }

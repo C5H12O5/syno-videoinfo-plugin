@@ -54,7 +54,7 @@
                   "extra": {
                     "[plugin_id]": {
                       "rating": {
-                        "[plugin_id]": "['xp_text', './/ratingValue']"
+                        "[plugin_id]": "['xp_text', './/ratingValue', 'float']"
                       },
                       "poster": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/m/\\\\2']",
                       "backdrop": "['xp_texts', './image', 're_sub', '(.+/photo)/s_ratio_poster/(public/.+)', '\\\\1/l/\\\\2']"
