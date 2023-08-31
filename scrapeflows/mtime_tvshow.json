@@ -1,0 +1,79 @@
+{
+  "type": "tvshow",
+  "site": "mtime.com",
+  "steps": [
+    {
+      "http": {
+        "url": "http://front-gateway.mtime.com/mtime-search/search/unionSearch2",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Host": "front-gateway.mtime.com",
+          "Origin": "http://film.mtime.com",
+          "Referer": "http://film.mtime.com/",
+          "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+        },
+        "body": {
+          "keyword": "{title}",
+          "searchType": 0,
+          "pageIndex": 1,
+          "pageSize": "{limit}",
+          "year": "{year}"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['re_matches', '\"movieId\":(\\d+),[^{{}}]*?\"movieContentType\":\"电视剧\"']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "http://front-gateway.mtime.com/library/movie/detail.api?movieId={id}",
+              "method": "GET",
+              "headers": {
+                "Host": "front-gateway.mtime.com",
+                "Origin": "http://movie.mtime.com",
+                "Referer": "http://movie.mtime.com/",
+                "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "tvshow": {
+                  "title": "['xp_text', './data/basic/name']",
+                  "original_available": "['xp_text', './data/basic/releaseDate', 'reformat', '%Y%m%d', '%Y-%m-%d']",
+                  "summary": "['xp_text', './data/basic/story']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "poster": "['xp_texts', './data/basic/img']",
+                      "backdrop": "['xp_texts', './data/basic/img']"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "retval": {
+              "source": "tvshow"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

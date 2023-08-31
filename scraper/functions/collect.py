@@ -92,7 +92,7 @@ def _render_str(tmpl: str, source, etree):
         result = source.get(expr)
 
     # modify result if needed
-    if result is not None and len(modification) > 0:
+    if result is not None and result != "" and len(modification) > 0:
         modifier, *args = modification
         result = _modify(result, modifier, args)
     return strip(result)
