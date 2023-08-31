@@ -148,6 +148,8 @@ def _modify(result: Any, strategy: str, args: list):
     args_len = len(args)
     if strategy == "int":
         result = int(result)
+    if strategy == "float":
+        result = float(result)
     elif strategy == "split" and args_len == 1:
         result = result.split(args[0])
     elif strategy == "prefix" and args_len == 1:

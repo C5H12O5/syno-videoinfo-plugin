@@ -68,13 +68,13 @@
                         }
                       },
                       "rating": {
-                        "[plugin_id]": "['xp_text', './movie/sc']"
+                        "[plugin_id]": "['xp_text', './movie/sc', 'float']"
                       },
                       "poster": "['xp_texts', './movie/img']"
                     }
                   }
                 },
-                "publish_date": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d']",
+                "publish_date": "['xp_text', './movie/pubDate', 'strftime', '%Y-%m-%d', 'True']",
                 "available_date": "{$parent[available]}"
               }
             }
