@@ -22,7 +22,8 @@ with open(_basedir / "templates/index.html", "r", encoding="utf-8") as html:
 def render_index(saved=None):
     """Render the index page."""
     source_html = ""
-    for site, site_conf in load_sites().items():
+    sites = load_sites()
+    for site, site_conf in sites.items():
         saved_conf = saved.get(site) if saved is not None else None
         config_html = render_config(site, site_conf, saved_conf)
         types = site_conf["types"]
@@ -30,7 +31,7 @@ def render_index(saved=None):
             "site": site,
             "movie": "selected" if "movie" in types else "disabled",
             "tvshow": "selected" if "tvshow" in types else "disabled",
-            "priority": 999,
+            "priority": len(sites),
             "config": config_html
         }
         if saved_conf is not None:
