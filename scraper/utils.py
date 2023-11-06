@@ -22,14 +22,18 @@ def strftime(
     return time.strftime(pattern, time.localtime(timestamp))
 
 
-def dict_update(d: dict, u: dict) -> dict:
+def dict_update(d1: dict, d2: dict) -> dict:
     """Recursively update a dictionary."""
-    for k, v in u.items():
-        if k in d and isinstance(d[k], dict) and isinstance(v, dict):
-            d[k] = dict_update(d[k], v)
+    for k, v2 in d2.items():
+        v1 = d1.get(k, None)
+        if isinstance(v1, dict) and isinstance(v2, dict):
+            d1[k] = dict_update(d1[k], v2)
+        elif isinstance(v1, list) and isinstance(v2, list):
+            d1[k].extend(x for x in v2 if x not in v1)
         else:
-            d[k] = v
-    return d
+            d1[k] = v2
+
+    return d1
 
 
 def strip(obj: Any) -> Any:
