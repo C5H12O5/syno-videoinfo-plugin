@@ -44,7 +44,7 @@
         "steps": [
           {
             "http": {
-              "url": "https://api.tmdb.org/3/tv/{id}?api_key={$parent[apikey]}&language={$parent[lang]}&append_to_response=content_ratings",
+              "url": "https://api.tmdb.org/3/tv/{id}?api_key={$parent[apikey]}&language={$parent[lang]}&append_to_response=content_ratings,external_ids",
               "method": "GET",
               "headers": {
                 "Accept": "application/json"
@@ -69,10 +69,18 @@
                         "summary": "['xp_text', './overview']",
                         "extra": {
                           "[plugin_id]": {
-                            "poster": ["['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"],
-                            "backdrop": ["['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"]
+                            "poster": [
+                              "['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"
+                            ],
+                            "backdrop": [
+                              "['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"
+                            ]
                           }
                         }
+                      },
+                      "reference": {
+                        "themoviedb_tv": "['xp_text', './id', 'int']",
+                        "imdb": "['xp_text', './external_ids/imdb_id']"
                       }
                     }
                   }
@@ -106,7 +114,9 @@
                   "director": "['re_matches', '\"department\":\"Directing\"[^{{}}]*?\"name\":\"([^\"]*?)\"']",
                   "extra": {
                     "[plugin_id]": {
-                      "poster": ["['xp_text', './still_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"]
+                      "poster": [
+                        "['xp_text', './still_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"
+                      ]
                     }
                   }
                 },

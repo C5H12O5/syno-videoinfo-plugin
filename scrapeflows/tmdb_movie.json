@@ -69,8 +69,19 @@
                   "director": "['re_matches', '\"name\":\"([^\"]*?)\"[^{{}}]*?\"department\":\"Directing\"']",
                   "extra": {
                     "[plugin_id]": {
-                      "poster": ["['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"],
-                      "backdrop": ["['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"]
+                      "poster": [
+                        "['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"
+                      ],
+                      "backdrop": [
+                        "['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"
+                      ],
+                      "reference": {
+                        "themoviedb": "['xp_text', './id', 'int']",
+                        "imdb": "['xp_text', './imdb_id']"
+                      },
+                      "collection_id": {
+                        "themoviedb": "['xp_text', './belongs_to_collection/id', 'int']"
+                      }
                     }
                   }
                 },

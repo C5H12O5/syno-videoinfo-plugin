@@ -85,6 +85,9 @@
                     "[plugin_id]": {
                       "tvshow": {
                         "summary": "['xp_text', './/span[@property=\"v:summary\"]']"
+                      },
+                      "reference": {
+                        "imdb": "['re_match', 'IMDb:</span>\\s*(.*?)\\s*<br>']"
                       }
                     }
                   }
