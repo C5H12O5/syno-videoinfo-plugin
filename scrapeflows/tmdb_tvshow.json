@@ -63,8 +63,12 @@
                   "summary": "['xp_text', './overview']",
                   "extra": {
                     "[plugin_id]": {
-                      "poster": ["['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"],
-                      "backdrop": ["['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"]
+                      "poster": [
+                        "['xp_text', './poster_path', 'prefix', 'https://image.tmdb.org/t/p/w500']"
+                      ],
+                      "backdrop": [
+                        "['xp_text', './backdrop_path', 'prefix', 'https://image.tmdb.org/t/p/original']"
+                      ]
                     }
                   }
                 }

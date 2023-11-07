@@ -48,7 +48,7 @@ def collect(args: CollectArgs, context: dict) -> None:
 
         target = context.get(ctxkey)
         if isinstance(target, list) and isinstance(result, list):
-            target.extend(result)
+            target.extend(x for x in result if x not in target)
         elif isinstance(target, dict) and isinstance(result, dict):
             dict_update(target, result)
         else:
@@ -121,7 +121,7 @@ def _xpath_find(strategy: str, expr: str, etree: Element):
     elif strategy == "text":
         return etree.findtext(expr)
     elif strategy == "texts":
-        return [e.text for e in etree.findall(expr)]
+        return list(dict.fromkeys(e.text for e in etree.findall(expr)))
     elif strategy.startswith("attr_"):
         elem = etree.find(expr)
         if elem is not None:
