@@ -32,7 +32,7 @@ def render_index(saved=None):
             "movie": "selected" if "movie" in types else "disabled",
             "tvshow": "selected" if "tvshow" in types else "disabled",
             "priority": len(sites),
-            "config": config_html
+            "config": config_html,
         }
         if saved_conf is not None:
             saved_types = saved_conf["types"]
@@ -101,33 +101,66 @@ _index_html = render_index()
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
     """Request handler for the HTTP server."""
 
+    def do_AUTH(self):
+        filepath = _basedir / "authorization"
+        if not filepath.exists():
+            return True
+
+        with open(filepath, "r", encoding="utf-8") as reader:
+            saved_auth = reader.read()
+
+        if self.headers.get("Authorization") is not None:
+            auth_header = self.headers.get("Authorization")
+            if auth_header.split("Basic ")[1] == saved_auth:
+                return True
+
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", 'Basic realm="Login Required"')
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(b"Unauthorized")
+        return False
+
     def do_GET(self):
+        if not self.do_AUTH():
+            return
+
         if self.path == "/":
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
 
-            conf_path = _basedir / "../scrapeflows.conf"
-            if conf_path.exists():
-                with open(conf_path, "r", encoding="utf-8") as reader:
+            filepath = _basedir / "../scrapeflows.conf"
+            if filepath.exists():
+                with open(filepath, "r", encoding="utf-8") as reader:
                     saved_conf = json.load(reader)
                 self.wfile.write(render_index(saved_conf).encode("utf-8"))
             else:
                 self.wfile.write(_index_html.encode("utf-8"))
 
-        elif self.path.endswith("/exit"):
+        elif self.path == "/exit":
             self.send_response(200)
             self.end_headers()
             self.server.server_close()
             sys.exit()
 
     def do_POST(self):
-        content_length = int(self.headers["Content-Length"])
-        body = self.rfile.read(content_length)
-        with open(_basedir / "../scrapeflows.conf", "w", encoding="utf-8") as w:
-            w.write(body.decode("utf-8"))
-        self.send_response(200)
-        self.end_headers()
+        if not self.do_AUTH():
+            return
+
+        filepath = None
+        if self.path == "/save":
+            filepath = _basedir / "../scrapeflows.conf"
+        elif self.path == "/auth":
+            filepath = _basedir / "authorization"
+
+        if filepath is not None:
+            content_length = int(self.headers["Content-Length"])
+            body = self.rfile.read(content_length)
+            with open(filepath, "w", encoding="utf-8") as w:
+                w.write(body.decode("utf-8"))
+            self.send_response(200)
+            self.end_headers()
 
 
 if __name__ == "__main__":

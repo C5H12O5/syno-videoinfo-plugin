@@ -20,6 +20,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="#auth" class="modal-trigger">
+                        Auth
+                        <ion-icon name="person-circle-outline"></ion-icon>
+                    </a>
+                </li>
+                <li>
                     <a href="#exit" class="modal-trigger">
                         Exit
                         <ion-icon name="power"></ion-icon>
@@ -68,6 +74,26 @@
         </div>
     </div>
 
+    <div id="auth" class="modal">
+        <div class="modal-content">
+            <h6>Enable basic authentication?</h6>
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="username" type="text" class="validate">
+                    <label for="username">Username</label>
+                </div>
+                <div class="input-field col s6">
+                    <input id="password" type="password" class="validate">
+                    <label for="password">Password</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close waves-effect btn-flat">Cancel</a>
+            <a id="auth-btn" class="modal-close waves-effect waves-green btn-flat">Confirm</a>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
@@ -99,10 +125,45 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data, null, 2)
                 }).then(response => {
                     if (response.ok) {
-                        M.toast({ html: 'Save successful!', classes: 'center-align green lighten-2' })
+                        M.toast({
+                            html: 'Save successful!',
+                            classes: 'center-align green lighten-2',
+                            displayLength: 1000
+                        })
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                }).catch(error => {
+                    M.toast({ html: error, classes: 'center-align red lighten-2' })
+                });
+            });
+
+            var authBtn = document.getElementById('auth-btn');
+            authBtn.addEventListener('click', event => {
+                event.preventDefault();
+
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+                if (username == '' && password == '') {
+                    return;
+                }
+
+                fetch('/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: btoa(username + ':' + password)
+                }).then(response => {
+                    if (response.ok) {
+                        M.toast({
+                            html: 'Authentication enabled!',
+                            classes: 'center-align green lighten-2',
+                            displayLength: 1000
+                        })
                     } else {
                         throw new Error(response.statusText);
                     }
