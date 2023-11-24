@@ -1,10 +1,10 @@
 # syno-videoinfo-plugin
 
-[![GitHub release](https://img.shields.io/github/v/release/C5H12O5/syno-videoinfo-plugin?logo=github)](https://github.com/C5H12O5/syno-videoinfo-plugin/releases)
-![GitHub stars](https://img.shields.io/github/stars/C5H12O5/syno-videoinfo-plugin?logo=github)
-![GitHub downloads](https://img.shields.io/github/downloads/C5H12O5/syno-videoinfo-plugin/total?logo=github)
-![GitHub top language](https://img.shields.io/github/languages/top/C5H12O5/syno-videoinfo-plugin)
-[![GitHub license](https://img.shields.io/github/license/C5H12O5/syno-videoinfo-plugin)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/c5h12o5/syno-videoinfo-plugin?logo=github)](https://github.com/c5h12o5/syno-videoinfo-plugin/releases)
+![GitHub stars](https://img.shields.io/github/stars/c5h12o5/syno-videoinfo-plugin?logo=github)
+![GitHub downloads](https://img.shields.io/github/downloads/c5h12o5/syno-videoinfo-plugin/total?logo=github)
+![GitHub top language](https://img.shields.io/github/languages/top/c5h12o5/syno-videoinfo-plugin)
+[![GitHub license](https://img.shields.io/github/license/c5h12o5/syno-videoinfo-plugin)](LICENSE)
 
 ##### 📖 [English](README.md) | 📖 简体中文
 
@@ -18,7 +18,7 @@
 
 安装插件：
 
-1. 从[**此处**](https://github.com/C5H12O5/syno-videoinfo-plugin/releases)下载最新版本。
+1. 从[**此处**](https://github.com/c5h12o5/syno-videoinfo-plugin/releases)下载最新版本。
 2. 打开 Video Station，进入 ***设置*** > ***视频信息插件***。
 3. 点击 ***新增***，选择第一步下载的压缩包，然后点击 ***确定***。
 
@@ -57,7 +57,7 @@
 1. 将本项目克隆到本地：
 
 ```sh
-$ git clone https://github.com/C5H12O5/syno-videoinfo-plugin
+$ git clone https://github.com/c5h12o5/syno-videoinfo-plugin
 ```
 
 2. 根据需要修改代码，并可以使用以下命令进行测试：
