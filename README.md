@@ -1,10 +1,10 @@
 # syno-videoinfo-plugin
 
-[![GitHub release](https://img.shields.io/github/v/release/C5H12O5/syno-videoinfo-plugin?logo=github)](https://github.com/C5H12O5/syno-videoinfo-plugin/releases)
-![GitHub stars](https://img.shields.io/github/stars/C5H12O5/syno-videoinfo-plugin?logo=github)
-![GitHub downloads](https://img.shields.io/github/downloads/C5H12O5/syno-videoinfo-plugin/total?logo=github)
-![GitHub top language](https://img.shields.io/github/languages/top/C5H12O5/syno-videoinfo-plugin)
-[![GitHub license](https://img.shields.io/github/license/C5H12O5/syno-videoinfo-plugin)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/c5h12o5/syno-videoinfo-plugin?logo=github)](https://github.com/c5h12o5/syno-videoinfo-plugin/releases)
+![GitHub stars](https://img.shields.io/github/stars/c5h12o5/syno-videoinfo-plugin?logo=github)
+![GitHub downloads](https://img.shields.io/github/downloads/c5h12o5/syno-videoinfo-plugin/total?logo=github)
+![GitHub top language](https://img.shields.io/github/languages/top/c5h12o5/syno-videoinfo-plugin)
+[![GitHub license](https://img.shields.io/github/license/c5h12o5/syno-videoinfo-plugin)](LICENSE)
 
 ##### 📖 English | 📖 [简体中文](README.zh-CN.md)
 
@@ -19,7 +19,7 @@ other than the default ones.
 
 Install the plugin:
 
-1. Download the latest release from [**here**](https://github.com/C5H12O5/syno-videoinfo-plugin/releases).
+1. Download the latest release from [**here**](https://github.com/c5h12o5/syno-videoinfo-plugin/releases).
 2. Open your Video Station, go to ***Settings*** > ***Video Info Plugin***.
 3. Click ***Add***, select the downloaded file, and click ***OK***.
 
@@ -58,7 +58,7 @@ You can develop your own plugin based on this project easily. Here are the steps
 1. Clone this repository to your local machine:
 
 ```sh
-$ git clone https://github.com/C5H12O5/syno-videoinfo-plugin
+$ git clone https://github.com/c5h12o5/syno-videoinfo-plugin
 ```
 
 2. Modify the code as you want, and test it like this:
