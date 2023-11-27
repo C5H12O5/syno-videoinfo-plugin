@@ -1,12 +1,12 @@
-# syno-videoinfo-plugin
+# *Syno*logy Video Info Plugin
 
-[![GitHub release](https://img.shields.io/github/v/release/c5h12o5/syno-videoinfo-plugin?logo=github)](https://github.com/c5h12o5/syno-videoinfo-plugin/releases)
-![GitHub stars](https://img.shields.io/github/stars/c5h12o5/syno-videoinfo-plugin?logo=github)
-![GitHub downloads](https://img.shields.io/github/downloads/c5h12o5/syno-videoinfo-plugin/total?logo=github)
-![GitHub top language](https://img.shields.io/github/languages/top/c5h12o5/syno-videoinfo-plugin)
-[![GitHub license](https://img.shields.io/github/license/c5h12o5/syno-videoinfo-plugin)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/c5h12o5/syno-videoinfo-plugin?logo=github&color=blue)](https://github.com/c5h12o5/syno-videoinfo-plugin/releases)
+![GitHub Stars](https://img.shields.io/github/stars/c5h12o5/syno-videoinfo-plugin?logo=github&color=yellow)
+![GitHub Downloads](https://img.shields.io/github/downloads/c5h12o5/syno-videoinfo-plugin/total?logo=github&color=green)
+![Python Support](https://img.shields.io/badge/Python-3.7+-green?logo=python&color=steelblue)
+[![GitHub License](https://img.shields.io/github/license/c5h12o5/syno-videoinfo-plugin?logo=apache&color=lightslategray)](LICENSE)
 
-##### 📖 English | 📖 [简体中文](README.zh-CN.md)
+###### 📖 English / 📖 [简体中文](README.zh-CN.md)
 
 This project is a video information plugin for Synology Video Station. It provides a way to fetch metadata from websites
 other than the default ones.
