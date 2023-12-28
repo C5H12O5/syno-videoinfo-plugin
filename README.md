@@ -1,10 +1,10 @@
 # *Syno*logy Video Info Plugin
 
-[![GitHub Release](https://img.shields.io/github/v/release/c5h12o5/syno-videoinfo-plugin?logo=github&color=blue)](https://github.com/c5h12o5/syno-videoinfo-plugin/releases)
-![GitHub Stars](https://img.shields.io/github/stars/c5h12o5/syno-videoinfo-plugin?logo=github&color=yellow)
-![GitHub Downloads](https://img.shields.io/github/downloads/c5h12o5/syno-videoinfo-plugin/total?logo=github&color=green)
+[![GitHub Release](https://img.shields.io/github/v/release/C5H12O5/syno-videoinfo-plugin?logo=github&color=blue)](https://github.com/C5H12O5/syno-videoinfo-plugin/releases)
+![GitHub Stars](https://img.shields.io/github/stars/C5H12O5/syno-videoinfo-plugin?logo=github&color=yellow)
+![GitHub Downloads](https://img.shields.io/github/downloads/C5H12O5/syno-videoinfo-plugin/total?logo=github&color=green)
 ![Python Support](https://img.shields.io/badge/Python-3.7+-green?logo=python&color=steelblue)
-[![GitHub License](https://img.shields.io/github/license/c5h12o5/syno-videoinfo-plugin?logo=apache&color=lightslategray)](LICENSE)
+[![GitHub License](https://img.shields.io/github/license/C5H12O5/syno-videoinfo-plugin?logo=apache&color=lightslategray)](LICENSE)
 
 ###### 📖 English / 📖 [简体中文](README.zh-CN.md)
 
@@ -19,7 +19,7 @@ other than the default ones.
 
 Install the plugin:
 
-1. Download the latest release from [**here**](https://github.com/c5h12o5/syno-videoinfo-plugin/releases).
+1. Download the latest release from [***here***](https://github.com/C5H12O5/syno-videoinfo-plugin/releases).
 2. Open your Video Station, go to ***Settings*** > ***Video Info Plugin***.
 3. Click ***Add***, select the downloaded file, and click ***OK***.
 
@@ -58,19 +58,19 @@ You can develop your own plugin based on this project easily. Here are the steps
 1. Clone this repository to your local machine:
 
 ```sh
-$ git clone https://github.com/c5h12o5/syno-videoinfo-plugin
+git clone https://github.com/C5H12O5/syno-videoinfo-plugin
 ```
 
 2. Modify the code as you want, and test it like this:
 
 ```sh
-$ python main.py --type movie --input "{\"title\":\"{movie_title}\"}" --limit 1 --loglevel debug
+python main.py --type movie --input "{\"title\":\"{movie_title}\"}" --limit 1 --loglevel debug
 ```
 
 3. Package the plugin using the following command:
 
 ```sh
-$ python setup.py sdist --formats=zip
+python setup.py sdist --formats=zip
 ```
 
 ## License
