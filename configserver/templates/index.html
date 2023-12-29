@@ -2,10 +2,11 @@
 <html lang="en">
 
 <head>
+    <title>Synology Video Info Plugin</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
-    <title>Synology Video Info Plugin</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/css/materialize.min.css" />
 </head>
 
 <body>
@@ -15,20 +16,20 @@
             <ul class="right hide-on-med-and-down">
                 <li>
                     <a href="https://github.com/C5H12O5/syno-videoinfo-plugin">
+                        <i class="material-symbols-outlined right">open_in_new</i>
                         GitHub
-                        <ion-icon name="open-outline"></ion-icon>
                     </a>
                 </li>
                 <li>
                     <a href="#auth" class="modal-trigger">
+                        <i class="material-symbols-outlined right">admin_panel_settings</i>
                         Auth
-                        <ion-icon name="person-circle-outline"></ion-icon>
                     </a>
                 </li>
                 <li>
                     <a href="#exit" class="modal-trigger">
+                        <i class="material-symbols-outlined right">power_settings_new</i>
                         Exit
-                        <ion-icon name="power"></ion-icon>
                     </a>
                 </li>
             </ul>
@@ -43,7 +44,7 @@
                 </div>
                 <div class="col s6 right-align">
                     <a href="#save" class="modal-trigger">
-                        <ion-icon name="save" size="large"></ion-icon>
+                        <i class="material-symbols-outlined" style="font-size:3rem;">save</i>
                     </a>
                 </div>
             </div>
@@ -51,9 +52,9 @@
                 ${sources}
             </ul>
             <div class="row">
-                <div class="input-field col s12">
-                    <textarea id="doh" class="materialize-textarea" rows="10"></textarea>
-                    <label for="doh">DoH Resolvers:</label>
+                <div class="col s12">
+                    <h6>DoH Resolvers:</h6>
+                    <div class="chips"></div>
                 </div>
             </div>
             <h5 class="right-align">${version}</h5>
@@ -101,8 +102,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/js/materialize.min.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', () => {
             M.AutoInit();

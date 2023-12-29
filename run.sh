@@ -18,7 +18,7 @@ while [ $i -le $# ]; do
 done
 
 if ! netstat -tuln | grep ":$PORT" >/dev/null; then
-	nohup /usr/bin/env python3 "$BASEDIR"/configserver/serve.py > /dev/null 2>&1 &
+	nohup /usr/bin/env python3 "$BASEDIR"/configserver/server.py > /dev/null 2>&1 &
 fi
 
 eval "/usr/bin/env python3 $BASEDIR/main.py $ARGV"
