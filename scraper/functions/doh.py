@@ -21,24 +21,22 @@ _registered_hosts = set()
 _doh_cache: Dict[str, str] = {}
 _doh_resolvers = [
     # https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https
-    "1.1.1.1/dns-query",
-    "1.0.0.1/dns-query",
-
-    # https://developers.google.com/speed/public-dns/docs/doh
-    "8.8.8.8/dns-query",
-    "8.8.4.4/dns-query",
+    "1.0.0.1",
+    "1.1.1.1",
 
     # https://support.quad9.net/hc/en-us
-    "9.9.9.9/dns-query",
-    "149.112.112.112/dns-query",
+    "9.9.9.9",
+    "149.112.112.112",
 
     # https://support.opendns.com/hc/en-us
-    "208.67.222.222/dns-query",
-    "208.67.220.220/dns-query",
+    "208.67.220.220",
+    "208.67.222.222",
+
+    # https://developers.google.com/speed/public-dns/docs/doh
+    "dns.google",
 
     # https://adguard-dns.io/public-dns.html
-    "94.140.14.14/dns-query",
-    "94.140.15.15/dns-query",
+    "dns.adguard-dns.com",
 ]
 
 
@@ -114,7 +112,7 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
     try:
         # send GET request to DoH resolver (RFC 8484)
         b64message = base64.b64encode(message).decode("utf-8").rstrip("=")
-        url = f"https://{resolver}?dns={b64message}"
+        url = f"https://{resolver}/dns-query?dns={b64message}"
         headers = {"Content-Type": "application/dns-message"}
         _logger.info("DoH request: %s", url)
 
@@ -140,7 +138,7 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
 
 def _doh_query_json(resolver: str, host: str) -> Optional[str]:
     """Query the IP address of the given host using the given DoH resolver."""
-    url = f"https://{resolver}?name={host}&type=A"
+    url = f"https://{resolver}/dns-query?name={host}&type=A"
     headers = {"Accept": "application/dns-json"}
     _logger.info("DoH request: %s", url)
     try:

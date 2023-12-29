@@ -5,8 +5,20 @@
     <title>Synology Video Info Plugin</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/css/materialize.min.css" />
+    <style>
+        .chip {
+            font-size: 14px;
+            align-items: center;
+            display: inline-flex;
+            border: 1px solid #e4e4e4;
+            border-radius: 8px;
+            background-color: transparent;
+            padding: 0 6px 0 12px;
+        }
+    </style>
 </head>
 
 <body>
@@ -53,8 +65,8 @@
             </ul>
             <div class="row">
                 <div class="col s12">
-                    <h6>DoH Resolvers:</h6>
-                    <div class="chips"></div>
+                    <h6>DNS-over-HTTPS Resolvers:</h6>
+                    <div id="doh" class="chips"></div>
                 </div>
             </div>
             <h5 class="right-align">${version}</h5>
@@ -103,8 +115,29 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/js/materialize.min.js"></script>
     <script type="text/javascript">
+        const resolvers = [
+            "1.0.0.1",
+            '1.1.1.1',
+            '9.9.9.9',
+            '149.112.112.112',
+            "208.67.220.220",
+            "208.67.222.222",
+            "dns.google",
+            "dns.adguard-dns.com",
+        ]
         document.addEventListener('DOMContentLoaded', () => {
             M.AutoInit();
+            M.Chips.init(document.getElementById('doh'), {
+                placeholder: 'Set up resolvers',
+                secondaryPlaceholder: '+ New resolver',
+                data: resolvers.map(resolver => ({tag: resolver})),
+                autocompleteOptions: {
+                    data: resolvers.reduce((obj, resolver) => {
+                        obj[resolver] = null;
+                        return obj;
+                    }, {})
+                }
+            });
 
             var saveBtn = document.getElementById('save-btn');
             saveBtn.addEventListener('click', event => {
