@@ -27,17 +27,23 @@ def render_index(saved=None):
         saved_conf = saved.get(site) if saved is not None else None
         config_html = render_config(site, site_conf, saved_conf)
         types = site_conf["types"]
+        doh_enabled = site_conf["doh_enabled"]
         source = {
             "site": site,
             "movie": "selected" if "movie" in types else "disabled",
             "tvshow": "selected" if "tvshow" in types else "disabled",
+            "doh_enabled": "selected" if doh_enabled else "",
+            "doh_disabled": "selected" if not doh_enabled else "",
             "priority": len(sites),
             "config": config_html,
         }
         if saved_conf is not None:
             saved_types = saved_conf["types"]
+            saved_doh = saved_conf["doh"]
             source["movie"] = "selected" if "movie" in saved_types else ""
             source["tvshow"] = "selected" if "tvshow" in saved_types else ""
+            source["doh_enabled"] = "selected" if saved_doh else ""
+            source["doh_disabled"] = "selected" if not saved_doh else ""
             source["priority"] = saved_conf["priority"]
         source_html += _source_tmpl.substitute(source)
 
@@ -64,10 +70,11 @@ def load_sites():
         with open(filepath, "r", encoding="utf-8") as flowdef_json:
             flowdef = json.load(flowdef_json)
         site = flowdef["site"]
-        type_ = flowdef["type"].split("_", 1)[0]
+        site_conf = sites.get(site, {})
+        site_conf["doh_enabled"] = flowdef.get("doh_enabled", False)
 
         # aggregate types
-        site_conf = sites.get(site, {})
+        type_ = flowdef["type"].split("_", 1)[0]
         types = site_conf.get("types", [])
         if type_ not in types:
             types.append(type_)

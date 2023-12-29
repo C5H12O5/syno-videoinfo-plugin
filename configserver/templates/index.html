@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
     <title>Synology Video Info Plugin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/css/materialize.min.css">
 </head>
 
 <body>
@@ -50,6 +50,12 @@
             <ul class="collapsible">
                 ${sources}
             </ul>
+            <div class="row">
+                <div class="input-field col s12">
+                    <textarea id="doh" class="materialize-textarea" rows="10"></textarea>
+                    <label for="doh">DoH Resolvers:</label>
+                </div>
+            </div>
             <h5 class="right-align">${version}</h5>
         </div>
     </div>
@@ -94,7 +100,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/js/materialize.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script type="text/javascript">
@@ -107,11 +113,12 @@
 
                 var data = {}
                 document.querySelectorAll('form').forEach(form => {
-                    var selectElem = form.querySelector('select');
-                    var selectInst = M.FormSelect.getInstance(selectElem);
+                    var typesElem = document.getElementById(form.id + '-types');
+                    var dohElem = document.getElementById(form.id + '-doh');
                     var priorityElem = document.getElementById(form.id + '-priority');
                     data[form.id] = {
-                        types: selectInst.getSelectedValues(),
+                        types: M.FormSelect.getInstance(typesElem).getSelectedValues(),
+                        doh: M.FormSelect.getInstance(dohElem).getSelectedValues()[0] == '1',
                         priority: parseInt(priorityElem.value)
                     }
                     var configs = document.getElementsByClassName(form.id + '-config');

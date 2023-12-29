@@ -1,6 +1,7 @@
 {
   "type": "movie",
   "site": "themoviedb.org",
+  "doh_enabled": true,
   "config": {
     "apikey": {
       "icon": "key",
