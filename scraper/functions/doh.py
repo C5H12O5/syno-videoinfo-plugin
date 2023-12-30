@@ -1,4 +1,5 @@
 """The implementation of the doh function."""
+import ast
 import base64
 import concurrent
 import concurrent.futures
@@ -9,6 +10,7 @@ import struct
 import urllib
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Optional
 
 from scraper.functions import Args, Func
@@ -24,25 +26,9 @@ _executor = concurrent.futures.ThreadPoolExecutor()
 # define default DoH configuration
 _doh_timeout = 5
 _doh_cache: Dict[str, str] = {}
-_doh_resolvers = [
-    # https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https
-    "1.0.0.1",
-    "1.1.1.1",
-
-    # https://support.quad9.net/hc/en-us
-    "9.9.9.9",
-    "149.112.112.112",
-
-    # https://support.opendns.com/hc/en-us
-    "208.67.220.220",
-    "208.67.222.222",
-
-    # https://developers.google.com/speed/public-dns/docs/doh
-    "dns.google",
-
-    # https://adguard-dns.io/public-dns.html
-    "dns.adguard-dns.com",
-]
+_resolvers_conf = Path(__file__).resolve().parent / "../../resolvers.conf"
+with open(_resolvers_conf, "r", encoding="utf-8") as doh_reader:
+    _doh_resolvers = ast.literal_eval(doh_reader.read())
 
 
 def _patched_getaddrinfo(host, *args, **kwargs):

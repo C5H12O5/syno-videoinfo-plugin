@@ -1,4 +1,5 @@
 """A simple HTTP server for configuration."""
+import ast
 import http
 import json
 import string
@@ -19,6 +20,10 @@ with open(_basedir / "templates/source.html", "r", encoding="utf-8") as html:
     _source_tmpl = string.Template(html.read())
 with open(_basedir / "templates/index.html", "r", encoding="utf-8") as html:
     _index_tmpl = string.Template(html.read())
+
+# initialize the DoH resolvers
+with open(_basedir / "../resolvers.conf", "r", encoding="utf-8") as doh_reader:
+    _doh_resolvers = ast.literal_eval(doh_reader.read())
 
 
 def render_index(saved=None):
@@ -49,7 +54,9 @@ def render_index(saved=None):
             source["priority"] = saved_conf["priority"]
         source_html += _source_tmpl.substitute(source)
 
-    return _index_tmpl.substitute(sources=source_html, version=plugin_version())
+    return _index_tmpl.substitute(
+        sources=source_html, resolvers=_doh_resolvers, version=plugin_version()
+    )
 
 
 def render_config(site, site_conf, saved_conf):
@@ -69,8 +76,8 @@ def load_sites():
     """Load the list of sites and types from flow definitions."""
     sites = {}
     for filepath in (_basedir / "../scrapeflows").glob("*.json"):
-        with open(filepath, "r", encoding="utf-8") as flowdef_json:
-            flowdef = json.load(flowdef_json)
+        with open(filepath, "r", encoding="utf-8") as def_reader:
+            flowdef = json.load(def_reader)
         site = flowdef["site"]
         site_conf = sites.get(site, {})
         site_conf["doh_enabled"] = flowdef.get("doh_enabled", False)
@@ -115,8 +122,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         if not filepath.exists():
             return True
 
-        with open(filepath, "r", encoding="utf-8") as reader:
-            saved_auth = reader.read()
+        with open(filepath, "r", encoding="utf-8") as auth_reader:
+            saved_auth = auth_reader.read()
 
         if self.headers.get("Authorization") is not None:
             auth_header = self.headers.get("Authorization")
@@ -141,8 +148,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
             filepath = _basedir / "../scrapeflows.conf"
             if filepath.exists():
-                with open(filepath, "r", encoding="utf-8") as reader:
-                    saved_conf = json.load(reader)
+                with open(filepath, "r", encoding="utf-8") as conf_reader:
+                    saved_conf = json.load(conf_reader)
                 self.wfile.write(render_index(saved_conf).encode("utf-8"))
             else:
                 self.wfile.write(_index_html.encode("utf-8"))
@@ -166,8 +173,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         if filepath is not None:
             content_length = int(self.headers["Content-Length"])
             body = self.rfile.read(content_length)
-            with open(filepath, "w", encoding="utf-8") as w:
-                w.write(body.decode("utf-8"))
+            with open(filepath, "w", encoding="utf-8") as writer:
+                writer.write(body.decode("utf-8"))
             self.send_response(200)
             self.end_headers()
 

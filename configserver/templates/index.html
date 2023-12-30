@@ -115,16 +115,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/js/materialize.min.js"></script>
     <script type="text/javascript">
-        const resolvers = [
-            "1.0.0.1",
-            '1.1.1.1',
-            '9.9.9.9',
-            '149.112.112.112',
-            "208.67.220.220",
-            "208.67.222.222",
-            "dns.google",
-            "dns.adguard-dns.com",
-        ]
+        const resolvers = ${resolvers}
         document.addEventListener('DOMContentLoaded', () => {
             M.AutoInit();
             M.Chips.init(document.getElementById('doh'), {

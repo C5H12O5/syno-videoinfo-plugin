@@ -50,7 +50,7 @@ setup(
         "configserver"
     ],
     package_data={
-        "": ["run.sh", "INFO"],
+        "": ["run.sh", "resolvers.conf", "INFO"],
         "scrapeflows": ["*.json"],
         "configserver": ["templates/*.html"],
     },
