@@ -14,9 +14,15 @@ from typing import Dict, List, Optional
 from scraper.functions import Args, Func
 
 _logger = logging.getLogger(__name__)
-_timeout = 5
+
+# define a global set to store registered hosts
 _registered_hosts = set()
+
+# define a global thread pool executor
 _executor = concurrent.futures.ThreadPoolExecutor()
+
+# define default DoH configuration
+_doh_timeout = 5
 _doh_cache: Dict[str, str] = {}
 _doh_resolvers = [
     # https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https
@@ -108,7 +114,7 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
         _logger.info("DoH request: %s", url)
 
         request = urllib.request.Request(url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=_timeout) as response:
+        with urllib.request.urlopen(request, timeout=_doh_timeout) as response:
             _logger.info("Resolver(%s) response: %s", resolver, response.status)
             if response.status != 200:
                 return None
@@ -133,7 +139,7 @@ def _doh_query_json(resolver: str, host: str) -> Optional[str]:
     _logger.info("DoH request: %s", url)
     try:
         request = urllib.request.Request(url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=_timeout) as response:
+        with urllib.request.urlopen(request, timeout=_doh_timeout) as response:
             _logger.info("Resolver(%s) response: %s", resolver, response.status)
             if response.status != 200:
                 return None

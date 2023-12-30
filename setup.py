@@ -6,13 +6,14 @@ from setuptools import setup
 
 from version import version
 
-root_dir = Path(__file__).resolve().parent
+# get the root directory of this plugin
+ROOT_DIR = Path(__file__).resolve().parent
 
 # use the name of the root directory as the plugin id
-plugin_id = root_dir.name
+PLUGIN_ID = ROOT_DIR.name
 
 # write the INFO file for this plugin
-info_tmpl = """
+INFO_TMPL = """
 {
   "id": "${plugin_id}-${version}",
   "entry_file": "run.sh",
@@ -33,13 +34,13 @@ info_tmpl = """
   }
 }
 """
-with open(root_dir / "INFO", "w", encoding="utf-8") as writer:
-    template = string.Template(info_tmpl)
-    writer.write(template.substitute(plugin_id=plugin_id, version=version()))
+with open(ROOT_DIR / "INFO", "w", encoding="utf-8") as writer:
+    template = string.Template(INFO_TMPL)
+    writer.write(template.substitute(plugin_id=PLUGIN_ID, version=version()))
 
 # use 'python setup.py sdist --formats=zip' command to create the zip file
 setup(
-    name=plugin_id,
+    name=PLUGIN_ID,
     version=version(),
     packages=[
         "",

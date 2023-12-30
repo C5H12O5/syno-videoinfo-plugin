@@ -6,9 +6,11 @@ import sys
 from http.server import HTTPServer
 from pathlib import Path
 
+HOST = "0.0.0.0"
+PORT = 5125
+
+# define the base directory
 _basedir = Path(__file__).resolve().parent
-_host = "0.0.0.0"
-_port = 5125
 
 # initialize the templates
 with open(_basedir / "templates/config.html", "r", encoding="utf-8") as html:
@@ -171,5 +173,5 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    httpd = HTTPServer((_host, _port), RequestHandler)
+    httpd = HTTPServer((HOST, PORT), RequestHandler)
     httpd.serve_forever()
