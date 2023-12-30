@@ -144,6 +144,7 @@ class ScrapeFlow:
             steps = list(flowdef["steps"])
             context = initialval.copy()
             context["site"] = site
+            context["doh"] = flowdef.get("doh_enabled", False)
             priority = None
             if siteconf is not None:
                 priority = siteconf["priority"]

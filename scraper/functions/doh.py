@@ -144,10 +144,14 @@ class DohArgs(Args):
 
     hosts: List[str]
 
-    def parse(self, rawargs: dict, _) -> "DohArgs":
-        self.hosts = rawargs.get("hosts", [])
-        if "host" in rawargs:
-            self.hosts.append(rawargs["host"])
+    def parse(self, rawargs: dict, context: dict) -> "DohArgs":
+        doh_enabled = context["doh"]
+        if doh_enabled:
+            self.hosts = rawargs.get("hosts", [])
+            if "host" in rawargs:
+                self.hosts.append(rawargs["host"])
+        else:
+            self.hosts = []
         return self
 
 

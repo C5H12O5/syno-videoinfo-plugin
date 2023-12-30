@@ -3,6 +3,14 @@
   "site": "douban.com",
   "steps": [
     {
+      "doh": {
+        "hosts": [
+          "www.douban.com",
+          "movie.douban.com"
+        ]
+      }
+    },
+    {
       "http": {
         "url": "https://www.douban.com/search?cat=1002&q={title}",
         "method": "GET",
