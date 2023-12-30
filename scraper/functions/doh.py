@@ -1,4 +1,5 @@
 """The implementation of the doh function."""
+import ast
 import base64
 import concurrent
 import concurrent.futures
@@ -6,40 +7,28 @@ import json
 import logging
 import socket
 import struct
-import time
 import urllib
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Optional
 
-from scraper.exceptions import RequestSendError
 from scraper.functions import Args, Func
 
 _logger = logging.getLogger(__name__)
-_timeout = 5
+
+# define a global set to store registered hosts
 _registered_hosts = set()
+
+# define a global thread pool executor
+_executor = concurrent.futures.ThreadPoolExecutor()
+
+# define default DoH configuration
+_doh_timeout = 5
 _doh_cache: Dict[str, str] = {}
-_doh_resolvers = [
-    # https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https
-    "1.1.1.1/dns-query",
-    "1.0.0.1/dns-query",
-
-    # https://developers.google.com/speed/public-dns/docs/doh
-    "8.8.8.8/dns-query",
-    "8.8.4.4/dns-query",
-
-    # https://support.quad9.net/hc/en-us
-    "9.9.9.9/dns-query",
-    "149.112.112.112/dns-query",
-
-    # https://support.opendns.com/hc/en-us
-    "208.67.222.222/dns-query",
-    "208.67.220.220/dns-query",
-
-    # https://adguard-dns.io/public-dns.html
-    "94.140.14.14/dns-query",
-    "94.140.15.15/dns-query",
-]
+_resolvers_conf = Path(__file__).resolve().parent / "../../resolvers.conf"
+with open(_resolvers_conf, "r", encoding="utf-8") as doh_reader:
+    _doh_resolvers = ast.literal_eval(doh_reader.read())
 
 
 def _patched_getaddrinfo(host, *args, **kwargs):
@@ -50,29 +39,21 @@ def _patched_getaddrinfo(host, *args, **kwargs):
     # check if the host is already resolved
     if host in _doh_cache:
         ip = _doh_cache[host]
-        _logger.info("Resolved %s to %s (cached)", host, ip)
+        _logger.info("Resolved [%s] to [%s] (cached)", host, ip)
         return _orig_getaddrinfo(ip, *args, **kwargs)
 
     # resolve the host using DoH
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = []
-        for resolver in _doh_resolvers:
-            futures.append(executor.submit(_doh_query, resolver, host))
+    futures = []
+    for resolver in _doh_resolvers:
+        futures.append(_executor.submit(_doh_query, resolver, host))
 
-        done, not_done = concurrent.futures.wait(
-            futures, return_when=concurrent.futures.FIRST_COMPLETED
-        )
-
-        for future in done:
-            ip = future.result()
-            if ip is not None:
-                _logger.info("Resolved %s to %s", host, ip)
-                _doh_cache[host] = ip
-                host = ip
-                break
-
-        for future in not_done:
-            future.cancel()
+    for future in concurrent.futures.as_completed(futures):
+        ip = future.result()
+        if ip is not None:
+            _logger.info("Resolved [%s] to [%s]", host, ip)
+            _doh_cache[host] = ip
+            host = ip
+            break
 
     return _orig_getaddrinfo(host, *args, **kwargs)
 
@@ -114,15 +95,15 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
     try:
         # send GET request to DoH resolver (RFC 8484)
         b64message = base64.b64encode(message).decode("utf-8").rstrip("=")
-        url = f"https://{resolver}?dns={b64message}"
+        url = f"https://{resolver}/dns-query?dns={b64message}"
         headers = {"Content-Type": "application/dns-message"}
         _logger.info("DoH request: %s", url)
 
         request = urllib.request.Request(url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=_timeout) as response:
-            _logger.info("DoH response: %s", response.status)
+        with urllib.request.urlopen(request, timeout=_doh_timeout) as response:
+            _logger.info("Resolver(%s) response: %s", resolver, response.status)
             if response.status != 200:
-                raise RequestSendError
+                return None
             resp_body = response.read()
 
         # parse DNS response message (RFC 1035)
@@ -133,30 +114,28 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
         # convert rdata to IP address
         return socket.inet_ntoa(resp_body[first_rdata_start:first_rdata_end])
     except Exception as e:
-        _logger.error("DoH request error: %s", e)
-        time.sleep(_timeout)
-        raise RequestSendError from e
+        _logger.error("Resolver(%s) request error: %s", resolver, e)
+        return None
 
 
 def _doh_query_json(resolver: str, host: str) -> Optional[str]:
     """Query the IP address of the given host using the given DoH resolver."""
-    url = f"https://{resolver}?name={host}&type=A"
+    url = f"https://{resolver}/dns-query?name={host}&type=A"
     headers = {"Accept": "application/dns-json"}
     _logger.info("DoH request: %s", url)
     try:
         request = urllib.request.Request(url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=_timeout) as response:
-            _logger.info("DoH response: %s", response.status)
+        with urllib.request.urlopen(request, timeout=_doh_timeout) as response:
+            _logger.info("Resolver(%s) response: %s", resolver, response.status)
             if response.status != 200:
-                raise RequestSendError
+                return None
             response_body = response.read().decode("utf-8")
             _logger.debug("<==  body: %s", response_body)
             answer = json.loads(response_body)["Answer"]
             return answer[0]["data"]
     except Exception as e:
-        _logger.error("DoH request error: %s", e)
-        time.sleep(_timeout)
-        raise RequestSendError from e
+        _logger.error("Resolver(%s) request error: %s", resolver, e)
+        return None
 
 
 @dataclass(init=False)
@@ -165,10 +144,14 @@ class DohArgs(Args):
 
     hosts: List[str]
 
-    def parse(self, rawargs: dict, _) -> "DohArgs":
-        self.hosts = rawargs.get("hosts", [])
-        if "host" in rawargs:
-            self.hosts.append(rawargs["host"])
+    def parse(self, rawargs: dict, context: dict) -> "DohArgs":
+        doh_enabled = context["doh"]
+        if doh_enabled:
+            self.hosts = rawargs.get("hosts", [])
+            if "host" in rawargs:
+                self.hosts.append(rawargs["host"])
+        else:
+            self.hosts = []
         return self
 
 

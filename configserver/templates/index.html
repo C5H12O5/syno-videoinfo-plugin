@@ -2,10 +2,23 @@
 <html lang="en">
 
 <head>
+    <title>Synology Video Info Plugin</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
-    <title>Synology Video Info Plugin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/css/materialize.min.css" />
+    <style>
+        .chip {
+            font-size: 14px;
+            align-items: center;
+            display: inline-flex;
+            border: 1px solid #e4e4e4;
+            border-radius: 8px;
+            background-color: transparent;
+            padding: 0 6px 0 12px;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,21 +27,21 @@
             <a class="brand-logo">Synology Video Info Plugin</a>
             <ul class="right hide-on-med-and-down">
                 <li>
-                    <a href="https://github.com/c5h12o5/syno-videoinfo-plugin">
+                    <a href="https://github.com/C5H12O5/syno-videoinfo-plugin">
+                        <i class="material-symbols-outlined right">open_in_new</i>
                         GitHub
-                        <ion-icon name="open-outline"></ion-icon>
                     </a>
                 </li>
                 <li>
                     <a href="#auth" class="modal-trigger">
+                        <i class="material-symbols-outlined right">admin_panel_settings</i>
                         Auth
-                        <ion-icon name="person-circle-outline"></ion-icon>
                     </a>
                 </li>
                 <li>
                     <a href="#exit" class="modal-trigger">
+                        <i class="material-symbols-outlined right">power_settings_new</i>
                         Exit
-                        <ion-icon name="power"></ion-icon>
                     </a>
                 </li>
             </ul>
@@ -43,13 +56,19 @@
                 </div>
                 <div class="col s6 right-align">
                     <a href="#save" class="modal-trigger">
-                        <ion-icon name="save" size="large"></ion-icon>
+                        <i class="material-symbols-outlined" style="font-size:3rem;">save</i>
                     </a>
                 </div>
             </div>
             <ul class="collapsible">
                 ${sources}
             </ul>
+            <div class="row">
+                <div class="col s12">
+                    <h6>DNS-over-HTTPS Resolvers:</h6>
+                    <div id="resolvers" class="chips"></div>
+                </div>
+            </div>
             <h5 class="right-align">${version}</h5>
         </div>
     </div>
@@ -94,38 +113,54 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/js/materialize.min.js"></script>
     <script type="text/javascript">
+        const resolvers = ${resolvers};
         document.addEventListener('DOMContentLoaded', () => {
             M.AutoInit();
+
+            var resolversElem = document.getElementById('resolvers');
+            M.Chips.init(resolversElem, {
+                placeholder: 'Set up resolvers',
+                secondaryPlaceholder: '+ New resolver',
+                data: resolvers.map(resolver => ({tag: resolver})),
+                autocompleteOptions: {
+                    data: resolvers.reduce((obj, resolver) => {
+                        obj[resolver] = null;
+                        return obj;
+                    }, {})
+                }
+            });
 
             var saveBtn = document.getElementById('save-btn');
             saveBtn.addEventListener('click', event => {
                 event.preventDefault();
 
-                var data = {}
+                var flowsConf = {};
                 document.querySelectorAll('form').forEach(form => {
-                    var selectElem = form.querySelector('select');
-                    var selectInst = M.FormSelect.getInstance(selectElem);
+                    var typesElem = document.getElementById(form.id + '-types');
+                    var dohElem = document.getElementById(form.id + '-doh');
                     var priorityElem = document.getElementById(form.id + '-priority');
-                    data[form.id] = {
-                        types: selectInst.getSelectedValues(),
+                    flowsConf[form.id] = {
+                        types: M.FormSelect.getInstance(typesElem).getSelectedValues(),
+                        doh: M.FormSelect.getInstance(dohElem).getSelectedValues()[0] == '1',
                         priority: parseInt(priorityElem.value)
-                    }
+                    };
                     var configs = document.getElementsByClassName(form.id + '-config');
                     [...configs].forEach(config => {
-                        data[form.id][config.id.substring(form.id.length + 1)] = config.value;
+                        flowsConf[form.id][config.id.substring(form.id.length + 1)] = config.value;
                     });
                 });
+
+                var resolversInst = M.Chips.getInstance(resolversElem);
+                var resolversConf = resolversInst.chipsData.map(chip => chip.tag);
 
                 fetch('/save', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data, null, 2)
+                    body: JSON.stringify({ flows: flowsConf, resolvers: resolversConf }, null, 2)
                 }).then(response => {
                     if (response.ok) {
                         M.toast({

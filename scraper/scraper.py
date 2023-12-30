@@ -125,12 +125,12 @@ class ScrapeFlow:
 
         flowconf = None
         if _flowconf_path.exists():
-            with open(_flowconf_path, "r", encoding="utf-8") as reader:
-                flowconf = json.load(reader)
+            with open(_flowconf_path, "r", encoding="utf-8") as conf_reader:
+                flowconf = json.load(conf_reader)
 
         for filepath in path.glob("*.json"):
-            with open(filepath, "r", encoding="utf-8") as flowdef_json:
-                flowdef = json.load(flowdef_json)
+            with open(filepath, "r", encoding="utf-8") as def_reader:
+                flowdef = json.load(def_reader)
             site = flowdef["site"]
             siteconf = None
             if flowconf is not None and site in flowconf:
@@ -144,6 +144,7 @@ class ScrapeFlow:
             steps = list(flowdef["steps"])
             context = initialval.copy()
             context["site"] = site
+            context["doh"] = flowdef.get("doh_enabled", False)
             priority = None
             if siteconf is not None:
                 priority = siteconf["priority"]

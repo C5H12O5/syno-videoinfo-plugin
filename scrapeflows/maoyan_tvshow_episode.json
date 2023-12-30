@@ -3,6 +3,11 @@
   "site": "maoyan.com",
   "steps": [
     {
+      "doh": {
+        "host": "i.maoyan.com"
+      }
+    },
+    {
       "http": {
         "url": "https://i.maoyan.com/apollo/ajax/search?kw={title}&cityId=1&stype=-1",
         "method": "GET",

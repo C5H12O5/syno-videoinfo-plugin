@@ -1,22 +1,30 @@
 <li>
     <div class="collapsible-header valign-wrapper">
-        <ion-icon name="create-outline" size="large"></ion-icon>
-        <span class="center-align">${site}</span>
+        <i class="material-symbols-outlined">edit_square</i>
+        ${site}
     </div>
     <div class="collapsible-body">
         <div class="row">
             <form id="${site}" class="col s12">
                 <div class="row">
-                    <div class="input-field col s9">
-                        <ion-icon class="prefix" name="layers"></ion-icon>
-                        <select multiple>
+                    <div class="input-field col s6">
+                        <i class="material-symbols-outlined prefix">stacks</i>
+                        <select multiple id="${site}-types">
                             <option value="movie" ${movie}>Movie</option>
                             <option value="tvshow" ${tvshow}>TVShow</option>
                         </select>
-                        <label>Enabled</label>
+                        <label>Effective video types</label>
                     </div>
                     <div class="input-field col s3">
-                        <ion-icon class="prefix" name="swap-vertical"></ion-icon>
+                        <i class="material-symbols-outlined prefix">foggy</i>
+                        <select id="${site}-doh">
+                            <option value="0" ${doh_disabled}>Disabled</option>
+                            <option value="1" ${doh_enabled}>Enabled</option>
+                        </select>
+                        <label>DNS-over-HTTPS</label>
+                    </div>
+                    <div class="input-field col s3">
+                        <i class="material-symbols-outlined prefix">swap_vert</i>
                         <input id="${site}-priority" value="${priority}" type="number" class="validate">
                         <label for="${site}-priority">Priority</label>
                     </div>

@@ -56,7 +56,7 @@ functions = {}
 
 # load all marked functions in this package
 for loader, modname, _ in pkgutil.walk_packages(__path__):
-    module = loader.find_module(modname).load_module(modname)  # type: ignore
+    module = loader.find_spec(modname).loader.load_module(modname)
     funcs = inspect.getmembers(
         module, lambda m: (inspect.isfunction(m) and hasattr(m, "_funcname"))
     )

@@ -3,6 +3,11 @@
   "site": "mtime.com",
   "steps": [
     {
+      "doh": {
+        "host": "front-gateway.mtime.com"
+      }
+    },
+    {
       "http": {
         "url": "http://front-gateway.mtime.com/mtime-search/search/unionSearch2",
         "method": "POST",
