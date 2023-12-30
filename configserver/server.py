@@ -13,6 +13,11 @@ PORT = 5125
 # define the base directory
 _basedir = Path(__file__).resolve().parent
 
+# define the configuration files
+_resolvers_conf = _basedir / "../resolvers.conf"
+_flows_conf = _basedir / "../scrapeflows.conf"
+_auth_conf = _basedir / "authorization"
+
 # initialize the templates
 with open(_basedir / "templates/config.html", "r", encoding="utf-8") as html:
     _config_tmpl = string.Template(html.read())
@@ -20,10 +25,6 @@ with open(_basedir / "templates/source.html", "r", encoding="utf-8") as html:
     _source_tmpl = string.Template(html.read())
 with open(_basedir / "templates/index.html", "r", encoding="utf-8") as html:
     _index_tmpl = string.Template(html.read())
-
-# initialize the DoH resolvers
-with open(_basedir / "../resolvers.conf", "r", encoding="utf-8") as doh_reader:
-    _doh_resolvers = ast.literal_eval(doh_reader.read())
 
 
 def render_index(saved=None):
@@ -55,7 +56,7 @@ def render_index(saved=None):
         source_html += _source_tmpl.substitute(source)
 
     return _index_tmpl.substitute(
-        sources=source_html, resolvers=_doh_resolvers, version=plugin_version()
+        sources=source_html, resolvers=load_resolvers(), version=load_version()
     )
 
 
@@ -100,8 +101,14 @@ def load_sites():
     return dict(sorted(sites.items(), key=lambda x: x[0]))
 
 
-def plugin_version():
-    """Get the plugin version from the directory name."""
+def load_resolvers():
+    """Load the list of DoH resolvers."""
+    with open(_resolvers_conf, "r", encoding="utf-8") as doh_reader:
+        return ast.literal_eval(doh_reader.read())
+
+
+def load_version():
+    """Load the plugin version from the directory name."""
     dir_name = _basedir.parent.name
     if "-" in dir_name:
         version = dir_name.split("-")[-1]
@@ -118,11 +125,10 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     """Request handler for the HTTP server."""
 
     def do_AUTH(self):
-        filepath = _basedir / "authorization"
-        if not filepath.exists():
+        if not _auth_conf.exists():
             return True
 
-        with open(filepath, "r", encoding="utf-8") as auth_reader:
+        with open(_auth_conf, "r", encoding="utf-8") as auth_reader:
             saved_auth = auth_reader.read()
 
         if self.headers.get("Authorization") is not None:
@@ -141,22 +147,21 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         if not self.do_AUTH():
             return
 
-        if self.path == "/":
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
 
-            filepath = _basedir / "../scrapeflows.conf"
-            if filepath.exists():
-                with open(filepath, "r", encoding="utf-8") as conf_reader:
+        if self.path == "/":
+            # index page
+            if _flows_conf.exists():
+                with open(_flows_conf, "r", encoding="utf-8") as conf_reader:
                     saved_conf = json.load(conf_reader)
                 self.wfile.write(render_index(saved_conf).encode("utf-8"))
             else:
                 self.wfile.write(_index_html.encode("utf-8"))
 
         elif self.path == "/exit":
-            self.send_response(200)
-            self.end_headers()
+            # close the server
             self.server.server_close()
             sys.exit()
 
@@ -164,19 +169,27 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         if not self.do_AUTH():
             return
 
-        filepath = None
-        if self.path == "/save":
-            filepath = _basedir / "../scrapeflows.conf"
-        elif self.path == "/auth":
-            filepath = _basedir / "authorization"
+        self.send_response(200)
+        self.end_headers()
+        content_length = int(self.headers["Content-Length"])
+        request_body = self.rfile.read(content_length)
 
-        if filepath is not None:
-            content_length = int(self.headers["Content-Length"])
-            body = self.rfile.read(content_length)
-            with open(filepath, "w", encoding="utf-8") as writer:
-                writer.write(body.decode("utf-8"))
-            self.send_response(200)
-            self.end_headers()
+        if self.path == "/save":
+            # save the configuration
+            conf = json.loads(request_body.decode("utf-8"))
+            with open(_flows_conf, "w", encoding="utf-8") as conf_writer:
+                conf_writer.write(json.dumps(
+                    conf["flows"], ensure_ascii=False, indent=2
+                ))
+            with open(_resolvers_conf, "w", encoding="utf-8") as doh_writer:
+                doh_writer.write(json.dumps(
+                    conf["resolvers"], ensure_ascii=False, indent=2
+                ))
+
+        elif self.path == "/auth":
+            # save the authorization
+            with open(_auth_conf, "w", encoding="utf-8") as auth_writer:
+                auth_writer.write(request_body.decode("utf-8"))
 
 
 if __name__ == "__main__":

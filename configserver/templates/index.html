@@ -66,7 +66,7 @@
             <div class="row">
                 <div class="col s12">
                     <h6>DNS-over-HTTPS Resolvers:</h6>
-                    <div id="doh" class="chips"></div>
+                    <div id="resolvers" class="chips"></div>
                 </div>
             </div>
             <h5 class="right-align">${version}</h5>
@@ -115,10 +115,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@1.2.2/dist/js/materialize.min.js"></script>
     <script type="text/javascript">
-        const resolvers = ${resolvers}
+        const resolvers = ${resolvers};
         document.addEventListener('DOMContentLoaded', () => {
             M.AutoInit();
-            M.Chips.init(document.getElementById('doh'), {
+
+            var resolversElem = document.getElementById('resolvers');
+            M.Chips.init(resolversElem, {
                 placeholder: 'Set up resolvers',
                 secondaryPlaceholder: '+ New resolver',
                 data: resolvers.map(resolver => ({tag: resolver})),
@@ -134,28 +136,31 @@
             saveBtn.addEventListener('click', event => {
                 event.preventDefault();
 
-                var data = {}
+                var flowsConf = {};
                 document.querySelectorAll('form').forEach(form => {
                     var typesElem = document.getElementById(form.id + '-types');
                     var dohElem = document.getElementById(form.id + '-doh');
                     var priorityElem = document.getElementById(form.id + '-priority');
-                    data[form.id] = {
+                    flowsConf[form.id] = {
                         types: M.FormSelect.getInstance(typesElem).getSelectedValues(),
                         doh: M.FormSelect.getInstance(dohElem).getSelectedValues()[0] == '1',
                         priority: parseInt(priorityElem.value)
-                    }
+                    };
                     var configs = document.getElementsByClassName(form.id + '-config');
                     [...configs].forEach(config => {
-                        data[form.id][config.id.substring(form.id.length + 1)] = config.value;
+                        flowsConf[form.id][config.id.substring(form.id.length + 1)] = config.value;
                     });
                 });
+
+                var resolversInst = M.Chips.getInstance(resolversElem);
+                var resolversConf = resolversInst.chipsData.map(chip => chip.tag);
 
                 fetch('/save', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data, null, 2)
+                    body: JSON.stringify({ flows: flowsConf, resolvers: resolversConf }, null, 2)
                 }).then(response => {
                     if (response.ok) {
                         M.toast({
