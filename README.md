@@ -8,7 +8,7 @@
 
 ###### 📖 English / 📖 [简体中文](README.zh-CN.md)
 
-This project is a video information plugin for Synology Video Station. It provides a way to fetch metadata from websites
+This project is a video information plugin for Synology **Video Station**. It provides a way to fetch metadata from websites
 other than the default ones.
 
 * Implemented in Python without any third-party dependencies.
@@ -20,14 +20,17 @@ other than the default ones.
 Install the plugin:
 
 1. Download the latest release from [***here***](https://github.com/C5H12O5/syno-videoinfo-plugin/releases).
-2. Open your Video Station, go to ***Settings*** > ***Video Info Plugin***.
-3. Click ***Add***, select the downloaded file, and click ***OK***.
+2. Open your **Video Station**, go to ***Settings*** > ***Video Info Plugin***.
+3. Click **[Add]**, select the downloaded file, and click **[OK]**.
 
 Configure the plugin:
 
-1. Open your browser, go to `http://[NAS_IP]:5125` (replace `[NAS_IP]` with your NAS IP address).
-2. Change the configuration as you want, and click ***Save Button*** in the upper right corner.
-3. Go back to your Video Station, the configuration should be applied automatically.
+1. Open your browser, go to `http://[NAS_IP]:5125` (replace `[NAS_IP]` with your NAS IP address) page.
+2. Change the configuration as you want, and click **[ :floppy_disk: ]** button in the upper right corner.
+3. Go back to your **Video Station**, the configuration should be applied automatically.
+* **[Note :warning: ]** If you upgrade the plugin but the configuration page is not updated, you can restart the configuration service by following steps:
+  1. Open the configuration page, click **[Exit]** button in the upper right corner to close the service.
+  2. Go back to **Video Station**, go to ***Settings*** > ***Video Info Plugin***, and click **[Test Connection]** button to restart the service.
 
 ## Requirements
 
