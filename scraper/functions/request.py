@@ -90,7 +90,7 @@ def _http_request(url, method, headers, body, timeout, cache_name):
 
     # check if the cache is expired
     shelve_flag = "c"  # creating database if not exist
-    for cache_file in _basedir.glob("cache_name*"):
+    for cache_file in _basedir.glob(cache_name + "*"):
         modify_time = cache_file.stat().st_mtime
         if (time.time() - modify_time) > _cache_expire:
             shelve_flag = "n"  # always create a new, empty database

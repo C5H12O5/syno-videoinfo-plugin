@@ -48,7 +48,7 @@ def _patched_getaddrinfo(host, *args, **kwargs):
     # check if the host is already resolved
     if host in _doh_cache:
         ip = _doh_cache[host]
-        _logger.info("Resolved %s to %s (cached)", host, ip)
+        _logger.info("Resolved [%s] to [%s] (cached)", host, ip)
         return _orig_getaddrinfo(ip, *args, **kwargs)
 
     # resolve the host using DoH
@@ -64,7 +64,7 @@ def _patched_getaddrinfo(host, *args, **kwargs):
         for future in done:
             ip = future.result()
             if ip is not None:
-                _logger.info("Resolved %s to %s", host, ip)
+                _logger.info("Resolved [%s] to [%s]", host, ip)
                 _doh_cache[host] = ip
                 host = ip
                 break
@@ -72,6 +72,7 @@ def _patched_getaddrinfo(host, *args, **kwargs):
         for future in not_done:
             future.cancel()
 
+    _logger.info("Calling original getaddrinfo with [%s]", host)
     return _orig_getaddrinfo(host, *args, **kwargs)
 
 
@@ -118,7 +119,7 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
 
         request = urllib.request.Request(url, headers=headers, method="GET")
         with urllib.request.urlopen(request, timeout=_timeout) as response:
-            _logger.info("DoH response: %s", response.status)
+            _logger.info("Resolver(%s) response: %s", resolver, response.status)
             if response.status != 200:
                 raise RequestSendError
             resp_body = response.read()
@@ -131,7 +132,7 @@ def _doh_query(resolver: str, host: str) -> Optional[str]:
         # convert rdata to IP address
         return socket.inet_ntoa(resp_body[first_rdata_start:first_rdata_end])
     except Exception as e:
-        _logger.error("DoH request error: %s", e)
+        _logger.error("Resolver(%s) request error: %s", resolver, e)
         time.sleep(_timeout)
         raise RequestSendError from e
 
@@ -144,7 +145,7 @@ def _doh_query_json(resolver: str, host: str) -> Optional[str]:
     try:
         request = urllib.request.Request(url, headers=headers, method="GET")
         with urllib.request.urlopen(request, timeout=_timeout) as response:
-            _logger.info("DoH response: %s", response.status)
+            _logger.info("Resolver(%s) response: %s", resolver, response.status)
             if response.status != 200:
                 raise RequestSendError
             response_body = response.read().decode("utf-8")
@@ -152,7 +153,7 @@ def _doh_query_json(resolver: str, host: str) -> Optional[str]:
             answer = json.loads(response_body)["Answer"]
             return answer[0]["data"]
     except Exception as e:
-        _logger.error("DoH request error: %s", e)
+        _logger.error("Resolver(%s) request error: %s", resolver, e)
         time.sleep(_timeout)
         raise RequestSendError from e
 
