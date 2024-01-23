@@ -39,10 +39,7 @@ class HttpArgs(Args):
     def parse(self, rawargs: dict, context: dict) -> "HttpArgs":
         # urlencode the request query string
         url = self.substitute(rawargs["url"], context)
-        url_split = url.split("?")
-        if len(url_split) > 1:
-            qs = urllib.parse.parse_qs(url_split[1])
-            url = url_split[0] + "?" + urllib.parse.urlencode(qs, doseq=True)
+        url = urllib.parse.quote(url, safe=":/?&=")
 
         # substitute the request headers
         headers = {
