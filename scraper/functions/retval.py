@@ -1,6 +1,5 @@
 """The implementation of the retval function."""
 import ast
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Optional, Union
 
@@ -8,7 +7,6 @@ from scraper.exceptions import StopSignal
 from scraper.functions import Args, Func
 
 
-@dataclass(init=False)
 class RetvalArgs(Args):
     """Arguments for the retval function."""
 

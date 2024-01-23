@@ -3,7 +3,6 @@ import ast
 import logging
 import re
 import time
-from dataclasses import dataclass
 from typing import Any
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
@@ -18,7 +17,6 @@ _logger = logging.getLogger(__name__)
 _pattern = re.compile(r"\s*\[.*]\s*")
 
 
-@dataclass(init=False)
 class CollectArgs(Args):
     """Arguments for the collect function."""
 

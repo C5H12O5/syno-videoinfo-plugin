@@ -9,7 +9,6 @@ import socket
 import struct
 import urllib
 import urllib.request
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -138,7 +137,6 @@ def _doh_query_json(resolver: str, host: str) -> Optional[str]:
         return None
 
 
-@dataclass(init=False)
 class DohArgs(Args):
     """Arguments for the doh function."""
 

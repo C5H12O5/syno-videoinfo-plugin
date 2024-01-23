@@ -6,7 +6,6 @@ import time
 import urllib
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
 from http.cookiejar import CookieJar
 from pathlib import Path
 from typing import Any
@@ -27,7 +26,6 @@ _global_opener = urllib.request.build_opener(_cookie_processor)
 urllib.request.install_opener(_global_opener)
 
 
-@dataclass(init=False)
 class HttpArgs(Args):
     """Arguments for the HTTP function."""
 

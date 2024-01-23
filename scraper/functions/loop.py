@@ -1,6 +1,5 @@
 """The implementation of the loop function."""
 import logging
-from dataclasses import dataclass
 from typing import Generator, List, Optional, Tuple
 
 from scraper.functions import Args, Func, functions
@@ -8,7 +7,6 @@ from scraper.functions import Args, Func, functions
 _logger = logging.getLogger(__name__)
 
 
-@dataclass(init=False)
 class LoopArgs(Args):
     """Arguments for the loop function."""
 
@@ -32,7 +30,7 @@ def loop(args: LoopArgs, context: dict) -> Generator:
         subcontext = {
             "$parent": context,
             "site": context["site"],
-            args.item: args.source[i]
+            args.item: args.source[i],
         }
         try:
             for funcname, rawargs in args.steps:
