@@ -30,15 +30,16 @@ Configure the plugin:
 1. Open your browser, go to `http://[NAS_IP]:5125` (replace `[NAS_IP]` with your NAS IP address) page.
 2. Change the configuration as you want, and click **[ :floppy_disk: ]** button in the upper right corner.
 3. Go back to your **Video Station**, the configuration should be applied automatically.
-* **[Note :warning: ]** If you upgrade the plugin but the configuration page is not updated, you can restart the configuration service by following steps:
-  1. Open the configuration page, click **[Exit]** button in the upper right corner to close the service.
-  2. Go back to **Video Station**, go to ***Settings*** > ***Video Info Plugin***, and click **[Test Connection]** button to restart the service.
+> [!NOTE]
+> If you upgrade the plugin but the configuration page is not updated, you can restart the configuration service by following steps:
+> 1. Open the configuration page, click **[Exit]** button in the upper right corner to close the service.
+> 2. Go back to **Video Station**, go to ***Settings*** > ***Video Info Plugin***, and click **[Test Connection]** button to restart the service.
 
 ## Requirements
 
 * Python 3.6+
-* DSM 7.0+
-* Video Station 3.0.0+
+* Video Station 2.5.0+ for DSM 6.0
+* Video Station 3.0.0+ for DSM 7.0
 
 ## References
 
