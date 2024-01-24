@@ -58,7 +58,8 @@ def scrape(plugin_id: str) -> str:
         "available": jsoninput.get("original_available", None),
         "year": str(jsoninput.get("original_available", ""))[:4],
         "lang": language,
-        "limit": maxlimit
+        "limit": maxlimit,
+        "version": _version(plugin_id),
     }
 
     # load and execute scrape flows using multithreading
@@ -98,11 +99,25 @@ def _start(flow: "ScrapeFlow", limit: int):
         _logger.error("Failed to scrape from %s", flow.site, exc_info=True)
 
 
+def _version(plugin_id: str) -> str:
+    """Split the plugin ID to get the version."""
+    if "-" in plugin_id:
+        version = plugin_id.split("-")[-1]
+        if version != "plugin":
+            return f"/{version}"
+    return ""
+
+
 class ScrapeFlow:
     """A flow of steps to scrape video information."""
 
-    def __init__(self, site: str, steps: list, context: dict,
-                 priority: Optional[int]):
+    def __init__(
+        self,
+        site: str,
+        steps: list,
+        context: dict,
+        priority: Optional[int],
+    ):
         self.site = site
         self.steps = steps
         self.context = context

@@ -6,7 +6,6 @@ import time
 import urllib
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
 from http.cookiejar import CookieJar
 from pathlib import Path
 from typing import Any
@@ -27,7 +26,6 @@ _global_opener = urllib.request.build_opener(_cookie_processor)
 urllib.request.install_opener(_global_opener)
 
 
-@dataclass(init=False)
 class HttpArgs(Args):
     """Arguments for the HTTP function."""
 
@@ -41,10 +39,7 @@ class HttpArgs(Args):
     def parse(self, rawargs: dict, context: dict) -> "HttpArgs":
         # urlencode the request query string
         url = self.substitute(rawargs["url"], context)
-        url_split = url.split("?")
-        if len(url_split) > 1:
-            qs = urllib.parse.parse_qs(url_split[1])
-            url = url_split[0] + "?" + urllib.parse.urlencode(qs, doseq=True)
+        url = urllib.parse.quote(url, safe=":/?&=")
 
         # substitute the request headers
         headers = {

@@ -3,7 +3,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/C5H12O5/syno-videoinfo-plugin?logo=github&style=flat&color=blue)](https://github.com/C5H12O5/syno-videoinfo-plugin/releases)
 ![GitHub Stars](https://img.shields.io/github/stars/C5H12O5/syno-videoinfo-plugin?logo=github&style=flat&color=yellow)
 ![GitHub Downloads](https://img.shields.io/github/downloads/C5H12O5/syno-videoinfo-plugin/total?logo=github&style=flat&color=green)
-![Python Support](https://img.shields.io/badge/Python-3.7+-green?logo=python&style=flat&color=steelblue)
+![Python Support](https://img.shields.io/badge/Python-3.6+-green?logo=python&style=flat&color=steelblue)
 [![GitHub License](https://img.shields.io/github/license/C5H12O5/syno-videoinfo-plugin?logo=apache&style=flat&color=lightslategray)](LICENSE)
 
 ###### 📖 English / 📖 [简体中文](README.zh-CN.md)
@@ -30,15 +30,16 @@ Configure the plugin:
 1. Open your browser, go to `http://[NAS_IP]:5125` (replace `[NAS_IP]` with your NAS IP address) page.
 2. Change the configuration as you want, and click **[ :floppy_disk: ]** button in the upper right corner.
 3. Go back to your **Video Station**, the configuration should be applied automatically.
-* **[Note :warning: ]** If you upgrade the plugin but the configuration page is not updated, you can restart the configuration service by following steps:
-  1. Open the configuration page, click **[Exit]** button in the upper right corner to close the service.
-  2. Go back to **Video Station**, go to ***Settings*** > ***Video Info Plugin***, and click **[Test Connection]** button to restart the service.
+> [!NOTE]
+> If you upgrade the plugin but the configuration page is not updated, you can restart the configuration service by following steps:
+> 1. Open the configuration page, click **[Exit]** button in the upper right corner to close the service.
+> 2. Go back to **Video Station**, go to ***Settings*** > ***Video Info Plugin***, and click **[Test Connection]** button to restart the service.
 
 ## Requirements
 
-* Python 3.7+
-* DSM 7.0+
-* Video Station 3.0.0+
+* Python 3.6+
+* Video Station 2.5.0+ for DSM 6.0
+* Video Station 3.0.0+ for DSM 7.0
 
 ## References
 
@@ -62,19 +63,19 @@ You can develop your own plugin based on this project easily. Here are the steps
 
 1. Clone this repository to your local machine:
 
-```sh
+```shell
 git clone https://github.com/C5H12O5/syno-videoinfo-plugin
 ```
 
 2. Modify the code as you want, and test it like this:
 
-```sh
+```shell
 python main.py --type movie --input "{\"title\":\"{movie_title}\"}" --limit 1 --loglevel debug
 ```
 
 3. Package the plugin using the following command:
 
-```sh
+```shell
 python setup.py sdist --formats=zip
 ```
 

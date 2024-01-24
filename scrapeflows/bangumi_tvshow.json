@@ -1,0 +1,77 @@
+{
+  "type": "tvshow",
+  "site": "bangumi.tv",
+  "steps": [
+    {
+      "doh": {
+        "host": "api.bgm.tv"
+      }
+    },
+    {
+      "http": {
+        "url": "https://api.bgm.tv/search/subject/{title}?type=2&start=0&max_results={limit}",
+        "method": "GET",
+        "headers": {
+          "User-Agent": "C5H12O5/syno-videoinfo-plugin{version} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['xp_texts', './list//id']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "https://api.bgm.tv/v0/subjects/{id}",
+              "method": "GET",
+              "headers": {
+                "User-Agent": "C5H12O5/syno-videoinfo-plugin{$parent[version]} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "tvshow": {
+                  "title": "['xp_text', './name_cn']",
+                  "original_available": "['xp_text', './date']",
+                  "summary": "['xp_text', './summary']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "poster": [
+                        "['xp_text', './images//large']"
+                      ],
+                      "backdrop": [
+                        "['xp_text', './images//large']"
+                      ]
+                    }
+                  }
+                },
+                "publish_date": "['xp_text', './date']",
+                "available_date": "{$parent[available]}"
+              }
+            }
+          },
+          {
+            "retval": {
+              "source": "tvshow",
+              "compare": "['publish_date', '>=', 'available_date']"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
