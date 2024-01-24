@@ -3,7 +3,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/C5H12O5/syno-videoinfo-plugin?logo=github&style=flat&color=blue)](https://github.com/C5H12O5/syno-videoinfo-plugin/releases)
 ![GitHub Stars](https://img.shields.io/github/stars/C5H12O5/syno-videoinfo-plugin?logo=github&style=flat&color=yellow)
 ![GitHub Downloads](https://img.shields.io/github/downloads/C5H12O5/syno-videoinfo-plugin/total?logo=github&style=flat&color=green)
-![Python Support](https://img.shields.io/badge/Python-3.7+-green?logo=python&style=flat&color=steelblue)
+![Python Support](https://img.shields.io/badge/Python-3.6+-green?logo=python&style=flat&color=steelblue)
 [![GitHub License](https://img.shields.io/github/license/C5H12O5/syno-videoinfo-plugin?logo=apache&style=flat&color=lightslategray)](LICENSE)
 
 ###### 📖 [English](README.md) / 📖 简体中文
@@ -35,7 +35,7 @@
 
 ## 版本要求
 
-* Python 3.7+
+* Python 3.6+
 * DSM 7.0+
 * Video Station 3.0.0+
 
@@ -61,19 +61,19 @@
 
 1. 将本项目克隆到本地：
 
-```sh
+```shell
 git clone https://github.com/C5H12O5/syno-videoinfo-plugin
 ```
 
 2. 根据需要修改代码，并可以使用以下命令进行测试：
 
-```sh
+```shell
 python main.py --type movie --input "{\"title\":\"{movie_title}\"}" --limit 1 --loglevel debug
 ```
 
 3. 然后可以使用以下命令进行打包并上传使用：
 
-```sh
+```shell
 python setup.py sdist --formats=zip
 ```
 
