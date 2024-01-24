@@ -1,0 +1,174 @@
+{
+  "type": "tvshow_episode",
+  "site": "bangumi.tv",
+  "steps": [
+    {
+      "doh": {
+        "host": "api.bgm.tv"
+      }
+    },
+    {
+      "http": {
+        "url": "https://api.bgm.tv/search/subject/{title}?type=2&start=0&max_results={limit}",
+        "method": "GET",
+        "headers": {
+          "User-Agent": "C5H12O5/syno-videoinfo-plugin{version} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+        },
+        "result": "metadata"
+      }
+    },
+    {
+      "collect": {
+        "source": "metadata",
+        "into": {
+          "ids": "['xp_texts', './list//id']"
+        }
+      }
+    },
+    {
+      "loop": {
+        "source": "ids",
+        "item": "id",
+        "steps": [
+          {
+            "http": {
+              "url": "https://api.bgm.tv/v0/episodes?subject_id={id}&type=0&limit=100&offset=0",
+              "method": "GET",
+              "headers": {
+                "User-Agent": "C5H12O5/syno-videoinfo-plugin{$parent[version]} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+              },
+              "result": "episodes"
+            }
+          },
+          {
+            "collect": {
+              "source": "episodes",
+              "into": {
+                "ep": "['re_match', '\"ep\":{$parent[episode]},[^{{}}]*?\"id\":(\\d*?),']"
+              }
+            }
+          },
+          {
+            "retval": {
+              "ifempty": "ep"
+            }
+          },
+          {
+            "http": {
+              "url": "https://api.bgm.tv/v0/subjects/{id}",
+              "method": "GET",
+              "headers": {
+                "User-Agent": "C5H12O5/syno-videoinfo-plugin{$parent[version]} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "episode": {
+                  "title": "['xp_text', './name_cn']",
+                  "tagline": "['xp_text', './name']",
+                  "original_available": "['xp_text', './date']",
+                  "summary": "['xp_text', './summary']",
+                  "certificate": "",
+                  "genre": "['xp_texts', './tags//name']",
+                  "actor": [],
+                  "writer": "['re_matches', '\"key\":\"原作\",\"value\":\"([^\"]*?)\"']",
+                  "director": "['re_matches', '\"key\":\"导演\",\"value\":\"([^\"]*?)\"']",
+                  "extra": {
+                    "[plugin_id]": {
+                      "tvshow": {
+                        "title": "['xp_text', './name_cn']",
+                        "original_available": "['xp_text', './date']",
+                        "summary": "['xp_text', './summary']",
+                        "extra": {
+                          "[plugin_id]": {
+                            "poster": [
+                              "['xp_text', './images//large']"
+                            ],
+                            "backdrop": [
+                              "['xp_text', './images//large']"
+                            ]
+                          }
+                        }
+                      },
+                      "rating": {
+                        "[plugin_id]": "['xp_text', './rating//score', 'float']"
+                      },
+                      "poster": [
+                        "['xp_text', './images//large']"
+                      ]
+                    }
+                  }
+                },
+                "publish_date": "['xp_text', './date']",
+                "available_date": "{$parent[available]}"
+              }
+            }
+          },
+          {
+            "collect": {
+              "source": "$parent",
+              "into": {
+                "episode": {
+                  "season": "['get', 'season']",
+                  "episode": "['get', 'episode']"
+                }
+              }
+            }
+          },
+          {
+            "http": {
+              "url": "https://api.bgm.tv/v0/subjects/{id}/characters",
+              "method": "GET",
+              "headers": {
+                "User-Agent": "C5H12O5/syno-videoinfo-plugin{$parent[version]} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+              },
+              "result": "characters"
+            }
+          },
+          {
+            "collect": {
+              "source": "characters",
+              "into": {
+                "episode": {
+                  "actor": "['xp_texts', './/actors//name']"
+                }
+              }
+            }
+          },
+          {
+            "http": {
+              "url": "https://api.bgm.tv/v0/episodes/{ep}",
+              "method": "GET",
+              "headers": {
+                "User-Agent": "C5H12O5/syno-videoinfo-plugin{$parent[version]} (https://github.com/C5H12O5/syno-videoinfo-plugin)"
+              },
+              "result": "subject"
+            }
+          },
+          {
+            "collect": {
+              "source": "subject",
+              "into": {
+                "episode": {
+                  "tagline": "['xp_text', './name_cn']",
+                  "original_available": "['xp_text', './airdate']",
+                  "summary": "['xp_text', './desc']"
+                }
+              }
+            }
+          },
+          {
+            "retval": {
+              "source": "episode",
+              "compare": "['publish_date', '>=', 'available_date']"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
