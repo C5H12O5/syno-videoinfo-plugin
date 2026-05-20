@@ -6,6 +6,7 @@ import time
 import urllib
 import urllib.parse
 import urllib.request
+import gzip
 from http.cookiejar import CookieJar
 from pathlib import Path
 from typing import Any
@@ -103,7 +104,10 @@ def _http_request(url, method, headers, body, timeout, cache_name):
             body = body.encode("utf-8") if body is not None else None
             request = urllib.request.Request(url, body, headers, method=method)
             with urllib.request.urlopen(request, timeout=timeout) as response:
-                response_body = response.read().decode("utf-8")
+                raw_body = response.read()
+                if response.headers.get("Content-Encoding", "").lower() == "gzip":
+                    raw_body = gzip.decompress(raw_body)
+                response_body = raw_body.decode("utf-8")
                 if 200 <= response.status < 300:
                     cache[cache_key] = response_body
                 _logger.info("HTTP response: %s", response.status)
