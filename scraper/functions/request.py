@@ -1,4 +1,6 @@
 """The implementation of the HTTP function."""
+
+import gzip
 import json
 import logging
 import shelve
@@ -6,7 +8,7 @@ import time
 import urllib
 import urllib.parse
 import urllib.request
-import gzip
+from http.client import IncompleteRead
 from http.cookiejar import CookieJar
 from pathlib import Path
 from typing import Any
@@ -104,7 +106,10 @@ def _http_request(url, method, headers, body, timeout, cache_name):
             body = body.encode("utf-8") if body is not None else None
             request = urllib.request.Request(url, body, headers, method=method)
             with urllib.request.urlopen(request, timeout=timeout) as response:
-                raw_body = response.read()
+                try:
+                    raw_body = response.read()
+                except IncompleteRead as e:
+                    raw_body = e.partial
                 if response.headers.get("Content-Encoding", "").lower() == "gzip":
                     raw_body = gzip.decompress(raw_body)
                 response_body = raw_body.decode("utf-8")
